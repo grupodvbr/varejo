@@ -1574,17 +1574,18 @@ if(periodoEl){
 // ================= RELOAD =================
 async function reload(){
 
-const btn = document.getElementById("btnAplicar")
-  const data = document.getElementById("data").value
+  const btn = document.getElementById("btnAplicar")
+  const input = document.getElementById("data")
 
-if(btn){
-  btn.classList.add("loading")
+  const data = input
+    ? input.value
+    : new Date().toISOString().slice(0,10)
 
   if(btn){
-  btn.classList.remove("loading")
-}
+    btn.classList.add("loading")
+  }
 
-  await new Promise(r => setTimeout(r, 150)) // 🔥 suaviza UX
+  await new Promise(r => setTimeout(r, 150))
 
   try{
     await load(data)
@@ -1592,7 +1593,9 @@ if(btn){
     console.error(e)
   }
 
-  btn.classList.remove("loading")
+  if(btn){
+    btn.classList.remove("loading")
+  }
 }
 
 // ================= START =================
