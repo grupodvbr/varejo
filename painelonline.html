@@ -86,6 +86,7 @@ header div:first-child{
   background:linear-gradient(180deg,var(--card),var(--card2));
   border-radius:14px;
   padding:8px;
+  overflow:hidden; /* 🔥 IMPEDE ESTOURO */
   overflow:hidden;
   display:flex;
   flex-direction:column;
@@ -93,6 +94,7 @@ header div:first-child{
   box-shadow:0 15px 35px rgba(0,0,0,0.5);
   border:1px solid var(--border);
   height:100%;
+    min-height:0; /* 🔥 PERMITE ENCOLHER */
 }
 
 /* ================= TOP ================= */
@@ -100,6 +102,7 @@ header div:first-child{
   display:flex;
   justify-content:space-between;
   align-items:center;
+  gap:4px;
 }
 
 /* ================= LOGO ================= */
@@ -113,7 +116,7 @@ header div:first-child{
 
 /* ================= VALOR ================= */
 .valor{
-  font-size:22px;
+  font-size:clamp(10px, 1.4vw, 12px);
   font-weight:800;
   color:var(--success);
   letter-spacing:0.5px;
@@ -132,7 +135,7 @@ header div:first-child{
   padding:6px;
   border-radius:8px;
   background:#020617;
-  font-size:11px;
+  font-size:clamp(9px, 1.3vw, 11px);
   border:1px solid var(--border);
 }
 
@@ -145,7 +148,7 @@ header div:first-child{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  font-size:12px;
+  font-size:clamp(10px, 1.5vw, 12px);
   border:1px solid var(--border);
 }
 
@@ -165,12 +168,13 @@ header div:first-child{
 /* ================= METAS ================= */
 .metas{
   display:flex;
-  gap:6px;
+  gap:4px;
 }
 
 .bola{
-  width:60px;
-  height:60px;
+ width:clamp(36px, 3vw, 48px);
+  height:clamp(36px, 3vw, 48px);
+  font-size:clamp(9px, 1.2vw, 11px);
   border-radius:50%;
   position:relative;
   display:flex;
