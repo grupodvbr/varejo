@@ -268,35 +268,6 @@ await supabase
       await new Promise(r => setTimeout(r, 120))
     }
 
-    const tempoTotal = ((Date.now() - startTotal)/1000).toFixed(2)
-
-    log("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-log("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-log("🎉 IMPORTAÇÃO FINALIZADA")
-log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-
-log(`🏢 Empresa: ${empresa}`)
-log(`📅 Período: ${inicio} → ${fim}`)
-
-log("\n📊 RESUMO:")
-log(`📥 Total recebido da API: ${totalRecebidos}`)
-log(`💾 Total inserido REAL: ${totalCupons}`)
-log(`💳 Pagamentos importados: ${totalPagamentos}`)
-log(`📄 Páginas processadas: ${totalPaginas}`)
-
-log(`\n⏱ Tempo total: ${tempoTotal}s`)
-
-log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-  
-  log(`📥 Total recebido da API: ${totalRecebidos}`)
-log(`💾 Total inserido REAL: ${totalCupons}`)
-log(`📉 Diferença: ${totalRecebidos - totalCupons}`)
-    log(`💳 Total pagamentos: ${totalPagamentos}`)
-    log(`📄 Total páginas: ${totalPaginas}`)
-    log(`⏱ Tempo total: ${tempoTotal}s`)
-    log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-
-    res.end()
 
   }catch(e){
 
