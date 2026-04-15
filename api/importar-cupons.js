@@ -66,7 +66,7 @@ export default async function handler(req, res){
     }
 
     log("✅ Token recebido")
-
+    const authToken = token.startsWith("Bearer") ? token : `Bearer ${token}`
     // ================= CONFIG =================
     const urls = {
       VAREJO_URL_MERCATTO: "https://mercatto.varejofacil.com/api/v1/venda/cupons-fiscais",
@@ -97,7 +97,7 @@ let paginasSemNovos = 0
     // ================= LOOP =================
     while(true){
 
-const url = `${baseURL}?pagina=${pagina}&count=${count}&q=data>=${inicio};data<=${fim}`
+const url = `${baseURL}?pagina=${pagina}&count=${count}&q=datahora>=${inicio}T00:00:00;datahora<=${fim}T23:59:59`
   const t0 = Date.now()
 
       let response
@@ -107,7 +107,8 @@ const url = `${baseURL}?pagina=${pagina}&count=${count}&q=data>=${inicio};data<=
         try{
 response = await fetch(url,{
 headers:{
-  "Authorization": token,
+  "Authorization": authToken,
+  "Accept": "application/json",
   "Content-Type": "application/json"
 }
 })
