@@ -90,15 +90,15 @@ export default async function handler(req, res){
     let totalCupons = 0
     let totalPagamentos = 0
     let totalPaginas = 0
-
+    const ids = new Set() // 🔥 OBRIGATÓRIO
 
     log("📡 INICIANDO PAGINAÇÃO...\n")
 let paginasSemNovos = 0
     // ================= LOOP =================
     while(true){
 
-      const url = `${baseURL}?pagina=${pagina}&count=${count}&q=datahora=ge=${inicio}T00:00:00;datahora=le=${fim}T23:59:59`
-      const t0 = Date.now()
+const url = `${baseURL}?pagina=${pagina}&count=${count}&q=data>=${inicio};data<=${fim}`
+  const t0 = Date.now()
 
       let response
 
@@ -106,10 +106,10 @@ let paginasSemNovos = 0
       for(let tentativa=1; tentativa<=3; tentativa++){
         try{
 response = await fetch(url,{
-  headers:{
-    Authorization: `Bearer ${token}`,
-    Accept:"application/json"
-  }
+headers:{
+  "Authorization": token,
+  "Content-Type": "application/json"
+}
 })
           if(response.ok) break
         }catch(e){}
