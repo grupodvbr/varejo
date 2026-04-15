@@ -1471,7 +1471,7 @@ window.dadosMesCache = parcial
 
 // 🔥 ATUALIZA TELA EM TEMPO REAL
 if(window.dadosCache){
-  render(window.dadosCache, parcial)
+  render(window.dadosCache, window.dadosMesCache)
 }
 await new Promise(r => setTimeout(r, 30))
 
