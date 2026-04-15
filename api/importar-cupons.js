@@ -66,7 +66,7 @@ export default async function handler(req, res){
     }
 
     log("✅ Token recebido")
-    const authToken = token.startsWith("Bearer") ? token : `Bearer ${token}`
+
     // ================= CONFIG =================
     const urls = {
       VAREJO_URL_MERCATTO: "https://mercatto.varejofacil.com/api/v1/venda/cupons-fiscais",
@@ -90,28 +90,30 @@ export default async function handler(req, res){
     let totalCupons = 0
     let totalPagamentos = 0
     let totalPaginas = 0
-    const ids = new Set() // 🔥 OBRIGATÓRIO
+
+    const ids = new Set()
 
     log("📡 INICIANDO PAGINAÇÃO...\n")
-let paginasSemNovos = 0
+     let paginaSemNovos = 0
+let ultimaPaginaHash = null
     // ================= LOOP =================
     while(true){
 
-const url = `${baseURL}?pagina=${pagina}&count=${count}&q=datahora>=${inicio}T00:00:00;datahora<=${fim}T23:59:59`
-  const t0 = Date.now()
+      const url = `${baseURL}?pagina=${pagina}&count=${count}&q=data=ge=${inicio};data=le=${fim}`
+
+      const t0 = Date.now()
 
       let response
 
       // 🔁 RETRY INTELIGENTE
       for(let tentativa=1; tentativa<=3; tentativa++){
         try{
-response = await fetch(url,{
-headers:{
-  "Authorization": authToken,
-  "Accept": "application/json",
-  "Content-Type": "application/json"
-}
-})
+          response = await fetch(url,{
+            headers:{
+              Authorization: token,
+              Accept:"application/json"
+            }
+          })
           if(response.ok) break
         }catch(e){}
 
@@ -132,45 +134,33 @@ if(!response || !response.ok){
       log(`📄 Página ${pagina} | Itens: ${items.length} | Tempo: ${tempoReq}s`)
 
 if(items.length === 0){
-  paginasSemNovos++
-
-  if(paginasSemNovos >= 3){
-    log("🏁 Fim real detectado")
-    break
-  }
-
-  pagina++
-  continue
+  log("🏁 Última página vazia - FIM")
+  break
 }
 
 // 🔍 Detecta repetição de página (API bug comum)
-const novos = items.filter(c => {
-  const id = empresa + "_" + c.id
-  return !ids.has(id)
-})
+const paginaHash = JSON.stringify(items.map(i => i.id))
 
-if(novos.length === 0){
-  paginasSemNovos++
-
-  log(`⚠️ Página sem novos (${paginasSemNovos})`)
-
-  if(paginasSemNovos >= 3){
-    log("🏁 Fim real detectado")
-    break
-  }
-
+if(paginaHash === ultimaPaginaHash){
+  log("⚠️ Página repetida - pulando...")
   pagina++
   continue
 }
 
-paginasSemNovos = 0
+ultimaPaginaHash = paginaHash
+
       const inserts = []
       const pagamentos = []
 
-      for(const cupom of novos){
+      for(const cupom of items){
 
         const unique_id = empresa + "_" + cupom.id
-        ids.add(unique_id) // 🔥 AQUI
+
+ if(ids.has(unique_id)){
+  continue
+}
+
+        ids.add(unique_id)
 
 log(`🧾 Cupom ${cupom.id} | R$ ${cupom.valor || 0}`)
 inserts.push({
@@ -243,6 +233,10 @@ await supabase
 
       totalPaginas++
 
+if(pagina > 10){
+  log("⛔ Limite de segurança (10 páginas)")
+  break
+}
 
       pagina++
 
