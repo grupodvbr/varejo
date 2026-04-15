@@ -1,39 +1,33 @@
-export default async function handler(req, res) {
+const { createClient } = require("@supabase/supabase-js")
 
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE
+)
+module.exports = async function handler(req, res){
+  
+  console.log("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+  console.log("🚀 SYNC RECEBIMENTOS START")
   console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-  console.log("🚀 RECEBIMENTOS START")
-  console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-
   const startTime = Date.now()
 
-  if (req.method !== "POST") {
-    console.log("⛔ Método inválido:", req.method)
-    return res.status(405).json({ error: "Método não permitido" })
+
+
+
+
+
+
+  
+  if(req.method !== "POST"){
+    return res.status(405).json({ error:"Use POST" })
   }
-
-  try {
-
+  try{
     const { token, dataInicio, dataFim, empresa } = req.body
 
-    console.log("📥 BODY:", req.body)
+    if(!token) return res.status(400).json({ error:"Token ausente" })
+    if(!empresa) return res.status(400).json({ error:"Empresa ausente" })
+    if(!dataInicio || !dataFim) return res.status(400).json({ error:"Datas obrigatórias" })
 
-    // ================= VALIDAÇÕES =================
-    if (!token) {
-      console.log("⛔ Token ausente")
-      return res.status(400).json({ error: "Token de autenticação ausente" })
-    }
-
-    if (!empresa) {
-      console.log("⛔ Empresa ausente")
-      return res.status(400).json({ error: "Empresa não informada" })
-    }
-
-    if (!dataInicio || !dataFim) {
-      console.log("⛔ Datas inválidas")
-      return res.status(400).json({ error: "Data início/fim obrigatória" })
-    }
-
-    // ================= MAPA DE EMPRESAS =================
     const urls = {
       VAREJO_URL_MERCATTO: "https://mercatto.varejofacil.com/api/v1/venda/cupons-fiscais",
       VAREJO_URL_VILLA: "https://deliciagourmet.varejofacil.com/api/v1/venda/cupons-fiscais",
@@ -43,145 +37,190 @@ export default async function handler(req, res) {
 
     const baseURL = urls[empresa]
 
-    if (!baseURL) {
-      console.log("⛔ Empresa inválida:", empresa)
-      return res.status(400).json({ error: `Empresa '${empresa}' não reconhecida.` })
+    if(!baseURL){
+      return res.status(400).json({ error:"Empresa inválida" })
     }
 
-    console.log("🏢 Empresa:", empresa)
-    console.log("📅 Período:", dataInicio, "→", dataFim)
+    console.log(`🏢 Empresa: ${empresa}`)
+    console.log(`📅 Período: ${dataInicio} → ${dataFim}`)
 
-    // ================= CONFIG =================
-    const count = 500
-    let start = 0
+    const count = 200
     let pagina = 1
     let totalGeral = 0
-    let allItems = []
+    let totalPagamentos = 0
+    const ids = new Set()
 
-    // ================= LOOP PAGINAÇÃO =================
-    while (true) {
+    console.log("\n📡 INICIANDO PAGINAÇÃO...\n")
 
-const url = `${baseURL}?pagina=${pagina}&count=${count}&q=dataHoraFechamentoCupom=ge=${dataInicio}T00:00:00;dataHoraFechamentoCupom=le=${dataFim}T23:59:59`
-  console.log(`\n📡 Página ${pagina}`)
-      console.log(`➡️ Start: ${start}`)
-      console.log(`➡️ URL: ${url}`)
+// 🔥 CALCULA UMA VEZ SÓ (ANTES DO WHILE)
+const agora = new Date(Date.now() + (3 * 60 * 60 * 1000))
+const inicio = new Date(agora.getTime() - (30 * 60 * 1000))
 
+function toISO(d){
+  const pad = n => String(n).padStart(2,"0")
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
+}
+
+const inicioISO = toISO(inicio)
+const fimISO = toISO(agora)
+
+while(true){
+
+// 🔥 FORMATADOR
+function toISO(d){
+  const pad = n => String(n).padStart(2,"0")
+
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
+}
+
+const inicioISO = toISO(inicio)
+const fimISO = toISO(agora)
+
+// 🔥 URL FINAL CORRETA
+const url = `${baseURL}?pagina=${pagina}&count=${count}&q=dataHoraFechamentoCupom=ge=${inicioISO};dataHoraFechamentoCupom=le=${fimISO}&sort=dataHoraFechamentoCupom`
+  
       const t0 = Date.now()
 
-      const response = await fetch(url, {
-        headers: {
+      const response = await fetch(url,{
+        headers:{
           Authorization: token,
-          Accept: "application/json"
+          Accept:"application/json"
         }
       })
 
-      const tempoReq = ((Date.now() - t0) / 1000).toFixed(2)
+      const tempoReq = ((Date.now() - t0)/1000).toFixed(2)
 
-      console.log(`⏱ Tempo requisição: ${tempoReq}s`)
+if(!response.ok){
 
-      if (!response.ok) {
-        const erro = await response.text()
-        console.error("❌ ERRO API:", erro)
+  const erro = await response.text()
 
-        return res.status(response.status).json({
-          ok:false,
-          error: erro,
-          empresa,
-          pagina
-        })
-      }
+  console.log(`❌ ERRO API (página ${pagina}) - IGNORANDO`)
+  
+  pagina++
+  await new Promise(r => setTimeout(r, 500))
+  
+  continue
+}
 
       const json = await response.json()
-
       const items = json.items || []
 
-      console.log(`📦 Itens recebidos: ${items.length}`)
+      console.log(
+        `📄 Página ${pagina} | ` +
+        `Itens: ${items.length} | ` +
+        `Tempo: ${tempoReq}s`
+      )
 
-// 🔥 CONTROLE DE DUPLICIDADE
-if (!global.ids) global.ids = new Set()
-if (!global.ultimaQtd) global.ultimaQtd = 0
 
-let novos = 0
 
-for (const item of items) {
-  if (!global.ids.has(item.id)) {
-    global.ids.add(item.id)
-    allItems.push(item)
-    novos++
-  }
-}
+      const inserts = []
+      const pagamentos = []
 
-totalGeral = allItems.length
+      for(const cupom of items){
 
-console.log(`🆕 Novos adicionados: ${novos}`)
-console.log(`📊 Total acumulado real: ${totalGeral}`)
+const unique_id = empresa + "_" + cupom.id
 
-// 🔴 Se não veio nada → acabou
-if (items.length === 0) {
-  console.log("📭 Fim da paginação")
-  break
-}
+if(ids.has(unique_id)) continue
+ids.add(unique_id)
 
-// 🔴 SE NÃO TROUXE NADA NOVO → PARA (CORREÇÃO PRINCIPAL)
-if (novos === 0) {
-  console.log("🛑 DUPLICAÇÃO DETECTADA → PARANDO")
-  break
-}
+        const valor_total = Number(cupom.valorTotal || 0)
+        const cancelado = !!cupom.cancelada
 
-// 🔴 SE PAROU DE CRESCER → PARA
-if (allItems.length === global.ultimaQtd) {
-  console.log("🛑 SEM CRESCIMENTO → PARANDO")
-  break
-}
+        const finalizadora_principal =
+          cupom.finalizacoes?.[0]?.descricao || null
+        inserts.push({
+          unique_id,
+          empresa,
+          empresa_id: empresa,
+          venda_id: cupom.id,
+          data: cupom.data,
+          valor_total,
+          valor_liquido: valor_total,
+          finalizadora_principal,
+          cancelado,
+          raw: cupom
+        })
+        if(Array.isArray(cupom.finalizacoes)){
+          cupom.finalizacoes.forEach(f=>{
+const valor = Number(f.valor || 0) - Number(f.troco || 0)
 
-global.ultimaQtd = allItems.length
+pagamentos.push({
+  cupom_unique_id: unique_id,
+  finalizadora_id: String(f.finalizadoraId),
+  finalizadora_nome: f.descricao,
+  valor
+})
+          })
+        }
+      }
+      if(inserts.length > 0){
 
-// 🔥 Próxima página
-pagina++
+        const { error } = await supabase
+          .from("cupons_importados")
+          .upsert(inserts, { onConflict:"unique_id" })
 
-// 🛑 Segurança
-if (pagina > 1000) {
-  console.log("⛔ LOOP BLOQUEADO")
-  break
-}
+        if(error){
+          console.log("❌ ERRO INSERT:", error.message)
+        } else {
+          totalGeral += inserts.length
+        }
+      }
 
-      // 🛑 Proteção contra loop infinito
-      if (pagina > 1000) {
-        console.log("⛔ LOOP BLOQUEADO (segurança)")
+      if(pagamentos.length > 0){
+
+        await supabase
+          .from("cupons_pagamentos")
+          .insert(pagamentos)
+
+        totalPagamentos += pagamentos.length
+      }
+
+      console.log(
+        `💾 Inseridos: ${inserts.length} | ` +
+        `💳 Pagamentos: ${pagamentos.length} | ` +
+        `📊 Total: ${totalGeral}`
+      )
+
+        if(items.length === 0){
+        console.log("🏁 ÚLTIMA PÁGINA")
         break
       }
+
+      pagina++
+      await new Promise(r => setTimeout(r, 120))
+
+  if(pagina > 10){
+  console.log("⛔ SEGURANÇA LOOP (10 páginas)")
+  break
+}
     }
 
-    const tempoTotal = ((Date.now() - startTime) / 1000).toFixed(2)
+    const tempoTotal = ((Date.now() - startTime)/1000).toFixed(2)
 
     console.log("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
     console.log("✅ FINALIZADO")
-    console.log("📊 Total cupons:", totalGeral)
-    console.log("📄 Total páginas:", pagina)
-    console.log("⏱ Tempo total:", tempoTotal, "s")
-    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    console.log(`📊 Total inseridos: ${totalGeral}`)
+    console.log(`💳 Total pagamentos: ${totalPagamentos}`)
+    console.log(`📄 Total páginas: ${pagina}`)
+    console.log(`⏱ Tempo total: ${tempoTotal}s`)
+    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
 
-    return res.status(200).json({
-      ok: true,
+    return res.json({
+      ok:true,
       empresa,
-      periodo: { inicio: dataInicio, fim: dataFim },
-      total: totalGeral,
+      totalInseridos: totalGeral,
+      totalPagamentos,
       paginas: pagina,
-      tempo: tempoTotal,
-      items: allItems
+      tempo: tempoTotal
     })
 
-  } catch (error) {
+  }catch(e){
 
-    console.error("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    console.error("💥 ERRO GERAL")
-    console.error(error)
-    console.error("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    console.log("💥 ERRO:", e.message)
 
     return res.status(500).json({
       ok:false,
-      error: "Falha ao consultar API",
-      details: error.message
+      error:e.message
     })
   }
 }
