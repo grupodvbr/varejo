@@ -187,50 +187,48 @@ header div:first-child{
 
   display:flex;
   flex-direction:column;
-  justify-content:center;
-  align-items:center;
 
-  width:76px;
+  width:80px;
   margin:0 auto;
 
-  padding:4px 6px;
+  padding:5px 6px;
 
   border-radius:10px;
 
   background:rgba(255,255,255,0.03);
   border:1px solid rgba(255,255,255,0.06);
-
-  gap:2px;
 }
 
-/* 🔤 TÍTULO */
+/* título */
 .mini-label{
   font-size:8px;
   color:#64748b;
   font-weight:600;
-  letter-spacing:0.5px;
+  text-align:center;
+  margin-bottom:2px;
 }
 
-/* 📊 LINHA DE VALORES */
+/* linha correta */
 .mini-valores{
   display:flex;
   justify-content:space-between;
+  align-items:center;
   width:100%;
-  font-size:9px;
 }
 
-/* 👤 VENDAS */
+/* vendas */
 .mini-vendas{
+  font-size:9px;
   color:#94a3b8;
   font-weight:700;
 }
 
-/* 💰 TICKET */
+/* ticket */
 .mini-ticket-text{
+  font-size:10px;
   color:#22c55e;
   font-weight:800;
 }
-
 /* BOLINHA */
 .bola{
   width:36px;
@@ -928,7 +926,7 @@ return `
   <div class="mini-label">Ticket Médio</div>
 
   <div class="mini-valores">
-    <span class="mini-vendas">${d.vendas} vendas</span>
+    <span class="mini-vendas">${d.vendas}</span>
     <span class="mini-ticket-text">${brl(ticketMedio)}</span>
   </div>
 </div>
