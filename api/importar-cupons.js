@@ -7,22 +7,49 @@ const supabase = createClient(
 
 export default async function handler(req, res){
 
+  // 🔥 STREAM REALTIME
+  res.writeHead(200, {
+    "Content-Type": "text/plain; charset=utf-8",
+    "Transfer-Encoding": "chunked"
+  })
+
+  function log(msg){
+    const time = new Date().toLocaleTimeString("pt-BR")
+    const linha = `[${time}] ${msg}`
+    console.log(linha)
+    res.write(linha + "\n")
+  }
+
   try{
 
-    
-    
-    const { empresa, empresa_nome, dataInicio, dataFim } = req.body
+    if(req.method !== "POST"){
+      log("❌ Método inválido")
+      res.end()
+      return
+    }
+
+    const { empresa, dataInicio, dataFim } = req.body
 
     if(!empresa){
-      return res.json({ ok:false, error:"Empresa não enviada" })
+      log("❌ Empresa não enviada")
+      res.end()
+      return
     }
 
     const hoje = new Date().toISOString().slice(0,10)
-
     const inicio = dataInicio || hoje
     const fim = dataFim || hoje
 
+    const startTotal = Date.now()
+
+    log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    log("🚀 INICIANDO IMPORTAÇÃO PROFISSIONAL")
+    log(`🏢 Empresa: ${empresa}`)
+    log(`📅 Período: ${inicio} → ${fim}`)
+
     // ================= LOGIN =================
+    log("🔐 Fazendo login...")
+
     const loginResp = await fetch(`${req.headers.origin}/api/login`,{
       method:"POST",
       headers:{ "Content-Type":"application/json" },
@@ -30,106 +57,223 @@ export default async function handler(req, res){
     })
 
     const loginData = await loginResp.json()
-
     const token = loginData.accessToken || loginData.token
 
     if(!token){
-      return res.json({ ok:false, error:"Token não retornado" })
+      log("❌ Token não retornado")
+      res.end()
+      return
     }
 
-    // ================= BUSCAR CUPONS =================
-    const resp = await fetch(`${req.headers.origin}/api/recebimentos`,{
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({
-        token,
-        empresa,
-        dataInicio: inicio,
-        dataFim: fim
-      })
-    })
+    log("✅ Token recebido")
 
-    const json = await resp.json()
-
-    const cupons = json.items || []
-
-    if(cupons.length === 0){
-      return res.json({ ok:true, inseridos:0, msg:"Sem cupons" })
+    // ================= CONFIG =================
+    const urls = {
+      VAREJO_URL_MERCATTO: "https://mercatto.varejofacil.com/api/v1/venda/cupons-fiscais",
+      VAREJO_URL_VILLA: "https://deliciagourmet.varejofacil.com/api/v1/venda/cupons-fiscais",
+      VAREJO_URL_PADARIA: "https://mercattodelicia.varejofacil.com/api/v1/venda/cupons-fiscais",
+      VAREJO_URL_DELICIA: "https://villachopp.varejofacil.com/api/v1/venda/cupons-fiscais"
     }
 
-    // ================= PREPARAR INSERT =================
-    const inserts = []
-    const pagamentos = []
+    const baseURL = urls[empresa]
 
-    for(const cupom of cupons){
+    if(!baseURL){
+      log("❌ Empresa inválida")
+      res.end()
+      return
+    }
 
-      const unique_id = empresa + "_" + cupom.id
+    // ================= VARIÁVEIS =================
+    let pagina = 1
+    const count = 200
 
-      // 🔹 cálculo base
-      const valor_total = Number(cupom.valorTotal || 0)
-      const cancelado = !!cupom.cancelada
+    let totalCupons = 0
+    let totalPagamentos = 0
+    let totalPaginas = 0
 
-      // 🔹 finalizadora principal
-      const finalizadora_principal =
-        cupom.finalizacoes?.[0]?.descricao || null
+    const ids = new Set()
 
-      inserts.push({
-        unique_id,
-        empresa: empresa_nome,
-        empresa_id: empresa,
-        venda_id: cupom.id,
-        data: cupom.data,
-        valor_total,
-        valor_liquido: valor_total,
-        finalizadora_principal,
-        cancelado,
-        raw: cupom
-      })
+    log("📡 INICIANDO PAGINAÇÃO...\n")
+     let paginaSemNovos = 0
+let ultimaPaginaHash = null
+    // ================= LOOP =================
+    while(true){
 
-      // 🔹 pagamentos separados
-      if(Array.isArray(cupom.finalizacoes)){
-        cupom.finalizacoes.forEach(f => {
-          pagamentos.push({
-            cupom_unique_id: unique_id,
-            finalizadora_id: String(f.finalizadoraId),
-            finalizadora_nome: f.descricao,
-            valor: Number(f.valor || 0)
+      const url = `${baseURL}?pagina=${pagina}&count=${count}&q=dataHora=ge=${inicio}T00:00:00;dataHora=le=${fim}T23:59:59`
+
+      const t0 = Date.now()
+
+      let response
+
+      // 🔁 RETRY INTELIGENTE
+      for(let tentativa=1; tentativa<=3; tentativa++){
+        try{
+          response = await fetch(url,{
+            headers:{
+              Authorization: token,
+              Accept:"application/json"
+            }
           })
-        })
+          if(response.ok) break
+        }catch(e){}
+
+        log(`⚠️ Tentativa ${tentativa} falhou...`)
+        await new Promise(r => setTimeout(r, 500 * tentativa))
       }
 
+if(!response || !response.ok){
+  log("❌ ERRO API - PARANDO")
+  break
+}
+
+      const tempoReq = ((Date.now() - t0)/1000).toFixed(2)
+
+      const json = await response.json()
+      const items = json.items || []
+
+      log(`📄 Página ${pagina} | Itens: ${items.length} | Tempo: ${tempoReq}s`)
+
+if(items.length === 0){
+  log("🏁 Última página vazia - FIM")
+  break
+}
+
+// 🔍 Detecta repetição de página (API bug comum)
+const paginaHash = JSON.stringify(items.map(i => i.id))
+
+if(paginaHash === ultimaPaginaHash){
+  log("⚠️ Página repetida - pulando...")
+  pagina++
+  continue
+}
+
+ultimaPaginaHash = paginaHash
+
+      const inserts = []
+      const pagamentos = []
+
+      for(const cupom of items){
+
+        const unique_id = empresa + "_" + cupom.id
+
+ if(ids.has(unique_id)){
+  continue
+}
+
+        ids.add(unique_id)
+
+log(`🧾 Cupom ${cupom.id} | R$ ${cupom.valor || 0}`)
+inserts.push({
+  unique_id,
+  empresa,
+  empresa_id: empresa,
+  venda_id: cupom.id,
+  data: cupom.data,
+  cancelado: !!cupom.cancelada,
+
+  // 🔥 DEIXA NULL → BANCO CALCULA
+  valor_total: null,
+  valor_liquido: null,
+  finalizadora_principal: null,
+
+  raw: cupom
+})
+
+        if(Array.isArray(cupom.finalizacoes)){
+          cupom.finalizacoes.forEach(f=>{
+            pagamentos.push({
+              cupom_unique_id: unique_id,
+              finalizadora_id: String(f.finalizadoraId),
+              finalizadora_nome: f.descricao,
+              valor: Number(f.valor || 0) - Number(f.troco || 0)
+            })
+          })
+        }
+      }
+
+
+
+
+
+
+      
+      // ================= INSERT CUPONS =================
+      if(inserts.length > 0){
+
+        const tInsert = Date.now()
+
+        const { error } = await supabase
+          .from("cupons_importados")
+          .upsert(inserts, { onConflict:"unique_id" })
+
+        if(error){
+          log("❌ ERRO INSERT CUPONS: " + error.message)
+        }else{
+          totalCupons += inserts.length
+        }
+
+        const tempoInsert = ((Date.now() - tInsert)/1000).toFixed(2)
+
+        log(`💾 Inseridos: ${inserts.length} | Tempo DB: ${tempoInsert}s`)
+      }
+
+      // ================= INSERT PAGAMENTOS =================
+      if(pagamentos.length > 0){
+
+await supabase
+  .from("cupons_pagamentos")
+  .upsert(pagamentos, {
+    onConflict: "cupom_unique_id,finalizadora_id"
+  })
+
+        totalPagamentos += pagamentos.length
+
+        log(`💳 Pagamentos inseridos: ${pagamentos.length}`)
+      }
+
+      totalPaginas++
+
+if(pagina > 50){
+  log("⛔ Limite de segurança (50 páginas)")
+  break
+}
+
+      pagina++
+
+      await new Promise(r => setTimeout(r, 120))
     }
 
-    // ================= INSERT CUPONS =================
-    const { error: erroInsert } = await supabase
-      .from("cupons_importados")
-      .upsert(inserts, { onConflict:"unique_id" })
+    const tempoTotal = ((Date.now() - startTotal)/1000).toFixed(2)
 
-    if(erroInsert){
-      return res.json({ ok:false, error: erroInsert.message })
-    }
+    log("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+log("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+log("🎉 IMPORTAÇÃO FINALIZADA")
+log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 
-    // ================= INSERT PAGAMENTOS =================
-    if(pagamentos.length > 0){
+log(`🏢 Empresa: ${empresa}`)
+log(`📅 Período: ${inicio} → ${fim}`)
 
-      await supabase
-        .from("cupons_pagamentos")
-        .insert(pagamentos)
-    }
+log("\n📊 RESUMO:")
+log(`🧾 Cupons importados: ${totalCupons}`)
+log(`💳 Pagamentos importados: ${totalPagamentos}`)
+log(`📄 Páginas processadas: ${totalPaginas}`)
 
-    return res.json({
-      ok:true,
-      inseridos: inserts.length,
-      pagamentos: pagamentos.length
-    })
+log(`\n⏱ Tempo total: ${tempoTotal}s`)
+
+log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+  
+  log(`📊 Total cupons: ${totalCupons}`)
+    log(`💳 Total pagamentos: ${totalPagamentos}`)
+    log(`📄 Total páginas: ${totalPaginas}`)
+    log(`⏱ Tempo total: ${tempoTotal}s`)
+    log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+
+    res.end()
 
   }catch(e){
 
-    return res.json({
-      ok:false,
-      error: e.message
-    })
-
+    console.log("💥 ERRO GERAL:", e.message)
+    res.write("💥 ERRO: " + e.message)
+    res.end()
   }
-
 }
