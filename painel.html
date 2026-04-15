@@ -1794,13 +1794,17 @@ function calcularTravasIsolado(financeiro, faturamento){
   let geral = 0
 
   const hoje = new Date()
-  const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1)
-  const fimMes = new Date(hoje.getFullYear(), hoje.getMonth()+1, 0)
+
+  const inicioDia = new Date(hoje)
+  inicioDia.setHours(0,0,0,0)
+
+  const fimDia = new Date(hoje)
+  fimDia.setHours(23,59,59,999)
 
   financeiro.forEach(f => {
 
-    const venc = new Date(f.vencimento)
-    if(venc < inicioMes || venc > fimMes) return
+const venc = new Date(f.vencimento)
+if(venc < inicioDia || venc > fimDia) return
 
     const raw = f.raw || {}
 
