@@ -924,8 +924,11 @@ if(!usarCacheMes){
 
   while(true){
 
-const dataSelecionada = document.getElementById("data").value
+const inputData = document.getElementById("data")
 
+const dataSelecionada = inputData
+  ? inputData.value
+  : new Date().toISOString().slice(0,10)
 const ano = dataSelecionada.split("-")[0]
 const mesNumero = dataSelecionada.split("-")[1]
 
@@ -1113,8 +1116,11 @@ window.addEventListener("DOMContentLoaded", async () => {
   const t = turno()
   const hoje = formatDateOnly(t.inicio)
 
-  document.getElementById("data").value = hoje
+const inputData = document.getElementById("data")
 
+if(inputData){
+  inputData.value = hoje
+}
   console.log("📅 Data automática:", hoje)
 
   await iniciarAutoImport()
