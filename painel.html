@@ -757,21 +757,7 @@ const dataFim = fim.toISOString().split("T")[0]
    const empBase = v.empresa_id
 const caixa = p.caixa
 
-function normalizarEmpresa(empBase, caixa){
 
-  const nome = (empBase || "").trim().toUpperCase()
-
-  if(nome.includes("DELICIA")) return "DELICIA"
-  if(nome.includes("VILLA")) return "VILLA"
-  if(nome.includes("PADARIA")) return "PADARIA"
-
-  if(nome.includes("MERCATTO")){
-    if(caixa >= 1 && caixa <= 5) return "MERCATTO EMPÓRIO"
-    if(caixa >= 6) return "MERCATTO RESTAURANTE"
-  }
-
-  return nome
-}
 
 const emp = normalizarEmpresa(empBase, caixa)
   
@@ -1226,11 +1212,7 @@ if(!usarCacheMes){
 
   while(true){
 
-const inputData = document.getElementById("data")
-
-const dataSelecionada = inputData
-  ? inputData.value
-  : new Date().toISOString().slice(0,10)
+const dataSelecionada = new Date().toISOString().slice(0,10)
 const ano = dataSelecionada.split("-")[0]
 const mesNumero = dataSelecionada.split("-")[1]
 
@@ -1703,7 +1685,6 @@ if(venc < inicioDia || venc > fimDia) return
     pctG: faturamento ? (geral / faturamento * 100) : 0
   }
 }
-}, 100)
 
 // ================= RELOAD =================
 async function reload(){
@@ -1747,15 +1728,10 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   console.log("📅 Data automática:", hoje)
 
-  await iniciarAutoImport()
   await load(hoje)
 
 })
 
-// 🔁 LOOP AUTO IMPORT
-setInterval(() => {
-  iniciarAutoImport()
-}, 5 * 60 * 1000)
 
 
 
