@@ -488,7 +488,12 @@ header div:first-child{
   line-height:1.2;
 }
 
-
+.cancel-inline{
+  margin-left:6px;
+  font-size:10px;
+  color:#ef4444;
+  font-weight:700;
+}
 
     
 </style>
@@ -884,14 +889,19 @@ return `
   </div>
 
 <div class="info-box">
+
   <div class="vendas-linha">
-    ${d.vendas} vendas
+    ${d.vendas} vendas 
+    <span class="cancel-inline">
+      ❌ ${d.cancelados}
+    </span>
   </div>
+
   <div class="ticket-linha">
     Ticket: ${brl(ticketMedio)}
   </div>
-</div>
 
+</div>
 
 
 
@@ -936,9 +946,6 @@ return `
 
   </div>
 
-  <div class="cancel">
-    ❌ ${d.cancelados} (${brl(d.valorCancelado)})
-  </div>
 `
   }
 
