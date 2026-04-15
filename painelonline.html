@@ -697,6 +697,30 @@ function parse(v){
   }
 }
 
+
+
+
+
+
+function normalizarFinanceiroEmpresa(nome){
+
+  const n = (nome || "").toUpperCase()
+
+  if(n.includes("VILLA")) return "VILLA"
+  if(n.includes("DELICIA")) return "DELICIA"
+  if(n.includes("PADARIA")) return "PADARIA"
+  if(n.includes("EMPORIO")) return "MERCATTO EMPÓRIO"
+  if(n.includes("RESTAURANTE")) return "MERCATTO RESTAURANTE"
+  if(n.includes("KIDS")) return "MKIDS"
+
+  return null
+}
+
+
+
+
+
+  
 // ================= PROCESS =================
 function process(data, inicio, fim, financeiro=[]){
 
@@ -823,8 +847,15 @@ const anoAtual = new Date().getFullYear()
 
 financeiro.forEach(f => {
 
-  const emp = (f.empresa || "").toUpperCase()
-  if(!result[emp]) return
+const empRaw =
+  f.empresa ||
+  f.empresa_nome ||
+  f.nome_empresa ||
+  ""
+
+const emp = normalizarFinanceiroEmpresa(empRaw)
+
+if(!emp || !result[emp]) return
 
   const d = result[emp]
 
@@ -1175,35 +1206,25 @@ function salvarCache(dados, dadosMes){
 
 async function carregarFinanceiro(){
 
-  let all = []
-  let last = "1900-01-01"
-  const step = 1000
+  const hoje = new Date().toISOString().slice(0,10)
 
-  while(true){
+  const inicioMes = hoje.slice(0,7) + "-01"
 
-    const { data, error } = await sb
-      .from("f360_parcelas")
-      .select("*")
-      .gt("criado_em", last)
-      .order("criado_em", { ascending: true })
-      .limit(step)
+  const { data, error } = await sb
+    .from("f360_parcelas")
+    .select("*")
+    .gte("vencimento", inicioMes)
+    .lte("vencimento", hoje)
 
-    if(error){
-      console.log("ERRO FIN:", error)
-      break
-    }
-
-    if(!data || data.length === 0) break
-
-    all = all.concat(data)
-    last = data[data.length - 1].criado_em
-
-    if(data.length < step) break
+  if(error){
+    console.log("❌ ERRO FINANCEIRO:", error)
+    return []
   }
 
-  return all
-}
+  console.log("💰 FINANCEIRO CARREGADO:", data?.length)
 
+  return data || []
+}
 
 
 
