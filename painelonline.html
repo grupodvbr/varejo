@@ -883,6 +883,17 @@ return `
     ${brl(d.total)}
   </div>
 
+<div class="info-box">
+  <div class="vendas-linha">
+    ${d.vendas} vendas
+  </div>
+  <div class="ticket-linha">
+    Ticket: ${brl(ticketMedio)}
+  </div>
+</div>
+
+
+
 
 </div>
 
@@ -912,7 +923,7 @@ return `
 
       <!-- 🔥 AGORA SIM: EMBAIXO DAS BOLAS -->
 <div class="mini-ticket">
-  <div class="mini-label">Ticket Almoço</div>
+  <div class="mini-label">Ticket Médio</div>
 
   <div class="mini-valores">
     <span class="mini-vendas">${d.vendas}</span>
@@ -924,7 +935,6 @@ return `
 </div>
 
   </div>
-
 
   <div class="cancel">
     ❌ ${d.cancelados} (${brl(d.valorCancelado)})
