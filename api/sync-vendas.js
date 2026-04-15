@@ -62,8 +62,8 @@ const agora = new Date(
 const hora = agora.getHours()
 
 // 🔥 REGRA PADARIA (RODA SÓ ATÉ 22H)
-if(emp.id === "VAREJO_URL_PADARIA" && hora >= 22){
-  console.log("🌙 PADARIA ignorada após 22h")
+if(emp.id === "VAREJO_URL_PADARIA" && hora >= 23){
+  console.log("🌙 PADARIA ignorada após 23h")
   continue
 }
 
@@ -206,11 +206,6 @@ if(pagamentos.length){
 console.log("🆕 Novos:", novos)
 console.log("📊 Total processado:", totalProcessados)
 
-// 🔥 PARADA REAL (ESSENCIAL)
-if(items.length < count){
-  console.log("🏁 Última página real")
-  break
-}
 // 🔥 FIM REAL
 if(items.length < count){
   console.log("🏁 Última página")
@@ -219,7 +214,7 @@ if(items.length < count){
 
           pagina++
 // 🔥 evita travar API
-await new Promise(r => setTimeout(r, 500))
+await new Promise(r => setTimeout(r, 100))
           // 🔥 LIMITE DE SEGURANÇA
 // 🔥 LIMITE PADARIA
 if(pagina > 50){
