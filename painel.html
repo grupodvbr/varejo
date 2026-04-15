@@ -1105,7 +1105,7 @@ while(true){
 
 
 let query = sb
-  .from("resumo_vendas")
+  .from("resumo_vendas_otimizado")
   .select("*")
   .gte("data", dataSelecionada)
   .lte("data", dataSelecionada)
@@ -1224,7 +1224,7 @@ const fimMes = new Date(ano, Number(mesNumero), 0)
   .split("T")[0]
 
 const { data, error } = await sb
-  .from("resumo_vendas")
+ .from("resumo_vendas_otimizado")
   .select("*")
   .gte("data", inicioMes)
   .lte("data", fimMes)
@@ -1422,7 +1422,7 @@ if(cache.dadosMes){
   while(true){
 
     const { data, error } = await sb
-      .from("resumo_vendas")
+     .from("resumo_vendas_otimizado")
       .select("*")
       .gte("data", inicioMes)
       .lte("data", fimMes)
