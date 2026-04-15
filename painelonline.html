@@ -702,15 +702,37 @@ function render(dados, dadosMes){
             const pct1 = Math.min((dMes.total/meta.prata)*100,100)
             const pct2 = Math.min((dMes.total/meta.ouro)*100,100)
 
-            return `
-              <div class="bola prata" style="--p:${pct1}%">
-                <span>${pct1.toFixed(0)}%</span>
-              </div>
+return `
+  <div class="bola prata" style="--p:${pct1}%">
+    <div style="
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      font-size:10px;
+      z-index:2;
+    ">
+      <span>${pct1.toFixed(0)}%</span>
+      <small style="font-size:8px;color:#94a3b8">
+        ${brl(meta.prata)}
+      </small>
+    </div>
+  </div>
 
-              <div class="bola ouro" style="--p:${pct2}%">
-                <span>${pct2.toFixed(0)}%</span>
-              </div>
-            `
+  <div class="bola ouro" style="--p:${pct2}%">
+    <div style="
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      font-size:10px;
+      z-index:2;
+    ">
+      <span>${pct2.toFixed(0)}%</span>
+      <small style="font-size:8px;color:#94a3b8">
+        ${brl(meta.ouro)}
+      </small>
+    </div>
+  </div>
+`
           })()}
         </div>
 
