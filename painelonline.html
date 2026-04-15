@@ -677,86 +677,78 @@ function render(dados, dadosMes){
     const ticketMedio = d.vendas > 0 ? d.total / d.vendas : 0
     const ticketAlmoco = d.almocoVendas > 0 ? d.almocoTotal / d.almocoVendas : 0
 
-    return `
-      <div class="card-top">
+return `
+  <div class="card-top">
 
-        <div style="display:flex;align-items:center;gap:8px">
+    <div style="display:flex;align-items:center;gap:8px">
 
-          <img src="${getLogo(emp)}" class="logo">
+      <img src="${getLogo(emp)}" class="logo">
 
-          <div style="display:flex;flex-direction:column;gap:2px">
-            <div class="valor">${brl(d.total)}</div>
-            <div style="font-size:11px;color:#94a3b8">
-              Ticket: ${brl(ticketMedio)}
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <div class="valor">${brl(d.total)}</div>
+        <div style="font-size:11px;color:#94a3b8">
+          Ticket: ${brl(ticketMedio)}
+        </div>
+      </div>
+
+    </div>
+
+    <div class="metas">
+      ${(() => {
+
+        const meta = getMetaEmpresa(emp)
+        if(!meta) return ""
+
+        const pct1 = Math.min((dMes.total/meta.prata)*100,100)
+        const pct2 = Math.min((dMes.total/meta.ouro)*100,100)
+
+        return `
+          <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+
+            <div class="bola prata" style="--p:${pct1}%">
+              <span style="font-size:13px">${pct1.toFixed(0)}%</span>
             </div>
+
+            <div style="font-size:10px;font-weight:700;color:#60a5fa">
+              ${brl(meta.prata)}
+            </div>
+
           </div>
 
-        </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
 
-<div class="metas">
-  ${(() => {
+            <div class="bola ouro" style="--p:${pct2}%">
+              <span style="font-size:13px">${pct2.toFixed(0)}%</span>
+            </div>
 
-    const meta = getMetaEmpresa(emp)
-    if(!meta) return ""
+            <div style="font-size:10px;font-weight:700;color:#facc15">
+              ${brl(meta.ouro)}
+            </div>
 
-    const pct1 = Math.min((dMes.total/meta.prata)*100,100)
-    const pct2 = Math.min((dMes.total/meta.ouro)*100,100)
-
-return `
-  <div style="display:flex;flex-direction:column;align-items:center">
-
-    <div class="bola prata" style="--p:${pct1}%">
-      <span>${pct1.toFixed(0)}%</span>
-    </div>
-
-    <div style="
-      font-size:9px;
-      color:#94a3b8;
-      margin-top:3px;
-    ">
-      ${brl(meta.prata)}
+          </div>
+        `
+      })()}
     </div>
 
   </div>
 
-  <div style="display:flex;flex-direction:column;align-items:center">
+  <div class="vendas">${d.vendas} vendas</div>
 
-    <div class="bola ouro" style="--p:${pct2}%">
-      <span>${pct2.toFixed(0)}%</span>
-    </div>
+  <div class="almoco">
+    🍽️ ${brl(d.almocoTotal)} (${d.almocoVendas})
+    <br>
+    Ticket: ${brl(ticketAlmoco)}
+  </div>
 
-    <div style="
-      font-size:9px;
-      color:#94a3b8;
-      margin-top:3px;
-    ">
-      ${brl(meta.ouro)}
-    </div>
+  <div class="mes">
+    <span>📊 Mês</span>
+    <span>${brl(dMes.total)}</span>
+  </div>
 
+  <div class="cancel">
+    ❌ ${d.cancelados} (${brl(d.valorCancelado)})
   </div>
 `
-  })()}
-</div>
-
-      </div>
-
-      <div class="vendas">${d.vendas} vendas</div>
-
-      <div class="almoco">
-        🍽️ ${brl(d.almocoTotal)} (${d.almocoVendas})
-        <br>
-        Ticket: ${brl(ticketAlmoco)}
-      </div>
-
-      <div class="mes">
-        <span>📊 Mês</span>
-        <span>${brl(dMes.total)}</span>
-      </div>
-
-      <div class="cancel">
-        ❌ ${d.cancelados} (${brl(d.valorCancelado)})
-      </div>
-    `
   }
 
   // 🔥 FIXO NOS CARDS
