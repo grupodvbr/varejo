@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>PAINEL DV</title>
+<title>CARNEIRO HOLDING</title>
   
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
@@ -11,23 +11,29 @@
   <style>
 
 :root{
-  --bg:#f1f5f9;
-  --card:#ffffff;
+  --bg:#020617;
+  --card:#0f172a;
+  --card2:#020617;
   --primary:#2563eb;
-  --success:#16a34a;
+  --success:#22c55e;
   --danger:#ef4444;
   --warning:#f59e0b;
-  --dark:#0f172a;
-  --text:#0f172a;
-  --sub:#64748b;
+  --text:#ffffff;
+  --sub:#94a3b8;
+  --border:#1e293b;
 }
 
 *{
   box-sizing:border-box;
+  margin:0;
+  padding:0;
 }
 
-body{
-  margin:0;
+/* ================= BASE ================= */
+html,body{
+  width:100%;
+  height:100%;
+  overflow:hidden; /* 🔥 SEM SCROLL PRA TV */
   font-family:Inter;
   background:var(--bg);
   color:var(--text);
@@ -35,266 +41,271 @@ body{
 
 /* ================= HEADER ================= */
 header{
-  background:var(--dark);
-  color:#fff;
-  padding:20px;
+  height:50px;
+  background:#020617;
+  border-bottom:1px solid var(--border);
   display:flex;
-  justify-content:space-between;
   align-items:center;
-  position:sticky;
-  top:0;
-  z-index:10;
+  justify-content:space-between;
+  padding:0 15px;
 }
 
 header div:first-child{
-  font-size:18px;
+  font-size:13px;
   font-weight:800;
-  letter-spacing:0.5px;
+  letter-spacing:1px;
 }
 
 #status{
-  font-size:12px;
-  opacity:0.7;
-}
-
-/* ================= CONTROLS ================= */
-.controls{
-  padding:15px;
-  background:#fff;
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  border-bottom:1px solid #e5e7eb;
-}
-
-input,button{
-  padding:10px 12px;
-  border-radius:10px;
-  border:1px solid #e5e7eb;
-  font-size:13px;
-}
-
-button{
-  background:var(--primary);
-  color:#fff;
-  font-weight:700;
-  cursor:pointer;
-  transition:0.2s;
-}
-
-button:hover{
-  opacity:0.9;
-}
-
-/* ================= KPI ================= */
-#kpis{
-  display:grid;
-  grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
-  gap:15px;
-  padding:15px;
-}
-
-.kpi{
-  background:linear-gradient(180deg,#fff,#f8fafc);
-  border-radius:14px;
-  padding:18px;
-  box-shadow:0 8px 25px rgba(0,0,0,0.06);
-}
-
-.kpi .label{
-  font-size:12px;
+  font-size:11px;
   color:var(--sub);
 }
 
-.kpi .value{
-  font-size:22px;
-  font-weight:800;
-  margin-top:5px;
+/* ================= REMOVE CONTROLS ================= */
+.controls,
+#kpis,
+#periodo{
+  display:none !important;
 }
 
-/* ================= GRID ================= */
+/* ================= GRID FIXO TV ================= */
 .grid{
+  height: calc(100vh - 50px);
   display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap:20px;
-  padding:20px;
+
+  grid-template-columns: 1fr 2fr;
+  grid-template-rows: repeat(3, 1fr);
+
+  gap:8px;
+  padding:8px;
 }
 
+
+
+  /* LINHA 1 */
+#villa        { grid-column:1; grid-row:1; }
+
+/* LINHA 2 */
+#delicia      { grid-column:1; grid-row:2; }
+
+
+
+/* LINHA 3 */
+#padaria      { grid-column:1; grid-row:3; }
 /* ================= CARD ================= */
 .card{
-  background:linear-gradient(180deg,#ffffff,#f8fafc);
-  border-radius:16px;
-  padding:20px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.08);
-  transition:all 0.2s ease;
-  position:relative;
+  background:linear-gradient(180deg,var(--card),var(--card2));
+  border-radius:14px;
+  padding:6px 8px 8px 8px; /* menos espaço em cima */
+  overflow:hidden; /* 🔥 IMPEDE ESTOURO */
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  box-shadow:0 15px 35px rgba(0,0,0,0.5);
+  border:1px solid var(--border);
+  height:100%;
+    min-height:0; /* 🔥 PERMITE ENCOLHER */
 }
 
-.card:hover{
-  transform:translateY(-4px);
-  box-shadow:0 20px 40px rgba(0,0,0,0.12);
-}
-
-.empresa{
-  font-size:13px;
-  color:var(--sub);
-  font-weight:700;
-  margin-bottom:6px;
-}
-
-.valor{
-  font-size:30px;
-  font-weight:800;
-  color:var(--success);
-  transition:0.3s;
-}
-
-/* ================= LISTA ================= */
-.item{
+/* ================= TOP ================= */
+.card-top{
   display:flex;
   justify-content:space-between;
+  align-items:flex-start;
+  gap:4px;
+}
+
+/* ================= LOGO ================= */
+.logo{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid var(--border);
+
+  margin-top:-2px; /* 🔥 ajuste fino */
+  transform:none; /* 🔥 remove o excesso */
+}
+@media (min-width:1400px){
+  .logo{
+    margin-top:-1px;
+  }
+}
+/* ================= VALOR ================= */
+.valor{
+  font-size:clamp(10px, 1.4vw, 12px);
+  font-weight:800;
+  color:var(--success);
+  letter-spacing:0.5px;
+}
+
+/* ================= VENDAS ================= */
+.vendas{
   font-size:12px;
+  color:var(--sub);
   margin-top:4px;
-  border-bottom:1px dashed #e5e7eb;
-  padding-bottom:2px;
+}
+
+
+/* ================= MÊS ================= */
+.mes{
+  margin-top:8px;
+  padding:8px;
+  border-radius:8px;
+  background:linear-gradient(135deg,#020617,#020617);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:clamp(10px, 1.5vw, 12px);
+  border:1px solid var(--border);
+}
+
+.mes span:last-child{
+  font-size:14px;
+  font-weight:800;
+  color:#22c55e;
+}
+
+/* ================= CANCELADOS ================= */
+.cancel{
+  font-size:11px;
+  color:var(--danger);
+  margin-top:4px;
 }
 
 /* ================= METAS ================= */
 .metas{
-  display:flex;
-  gap:20px;
-  margin-top:12px;
+  display:grid;
+  grid-template-columns: auto auto;
+  justify-content:center;
+  gap:6px 6px;
 }
 
-.bola{
-  width:70px;
-  height:70px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  position:relative;
-}
-.conteudo-bola{
-  position:relative;
-  z-index:2;
+.mini-ticket{
+  grid-column: span 2;
+
   display:flex;
   flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  font-size:13px;
-  font-weight:800;
-  text-align:center;
-}
 
-.conteudo-bola small{
-  font-size:9px;
-  font-weight:600;
-  margin-top:2px;
-}
+  width:80px;
+  margin:0 auto;
 
-    
-.bola::before{
-  content:"";
-  position:absolute;
-  width:52px;
-  height:52px;
-  background:#fff;
-  border-radius:50%;
-}
-.bola span{
-  position:relative;
-  z-index:2;
-}
+  padding:5px 6px;
 
-/* PRATA */
-.prata{
-  background:conic-gradient(#2563eb var(--p), #e5e7eb 0);
-}
-
-/* OURO */
-.ouro{
-  background:conic-gradient(#eab308 var(--p), #e5e7eb 0);
-}
-
-/* ================= BADGES ================= */
-.badge{
-  display:inline-block;
-  padding:4px 8px;
-  border-radius:6px;
-  font-size:11px;
-  font-weight:700;
-  margin-top:6px;
-}
-
-.badge-success{
-  background:#dcfce7;
-  color:#166534;
-}
-
-.badge-danger{
-  background:#fee2e2;
-  color:#991b1b;
-}
-
-.badge-warning{
-  background:#fef3c7;
-  color:#92400e;
-}
-
-/* ================= BOXES ================= */
-.box{
-  margin-top:8px;
-  padding:10px;
   border-radius:10px;
-  font-size:12px;
+
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.06);
 }
 
-.box-gray{
-  background:#f1f5f9;
+/* título */
+.mini-label{
+  font-size:8px;
+  color:#64748b;
+  font-weight:600;
+  text-align:center;
+  margin-bottom:2px;
 }
 
-.box-dark{
-  background:linear-gradient(135deg,#0f172a,#1e293b);
-  color:#fff;
+/* linha correta */
+.mini-valores{
   display:flex;
   justify-content:space-between;
   align-items:center;
+  width:100%;
 }
 
-/* ================= LOADING ================= */
-#loading{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:#fff;
+/* vendas */
+.mini-vendas{
+  font-size:9px;
+  color:#94a3b8;
+  font-weight:700;
+}
+
+/* ticket */
+.mini-ticket-text{
+  font-size:10px;
+  color:#22c55e;
+  font-weight:800;
+}
+/* BOLINHA */
+.bola{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  position:relative;
+
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:20px;
-  z-index:999;
+
+  font-size:11px;
+  font-weight:700;
+
+  overflow:hidden;
 }
 
+/* FURO INTERNO (define a espessura) */
+.bola::before{
+  content:"";
+  position:absolute;
+  width:28px;
+  height:28px;
+  background:#020617;
+  border-radius:50%;
+  z-index:1;
+}
 
+/* TEXTO % */
+.bola span{
+  position:relative;
+  z-index:2;
+  font-size:11px;
+  font-weight:700;
+}
 
+/* CORES */
+.prata{
+  background:conic-gradient(#c0c0c0 var(--p), #1e293b 0);
+}
 
+.ouro{
+  background:conic-gradient(#d4af37 var(--p), #1e293b 0);
+}
+
+/* ================= TOTAL CARD ================= */
+.total-card{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+}
+
+.total-card .titulo{
+  font-size:12px;
+  color:var(--sub);
+}
+
+.total-card .valor{
+  font-size:34px;
+}
+
+/* ================= STATUS ================= */
 .status-dot{
-  width:12px;
-  height:12px;
+  width:10px;
+  height:10px;
   border-radius:50%;
   background:#22c55e;
   position:fixed;
-  top:15px;
-  right:15px;
-  box-shadow:0 0 10px #22c55e;
-  z-index:999;
-  transition:0.3s;
+  top:8px;
+  right:10px;
+  box-shadow:0 0 8px #22c55e;
 }
+
 .status-dot.loading{
   background:#f59e0b;
-  box-shadow:0 0 10px #f59e0b;
+  box-shadow:0 0 8px #f59e0b;
   animation:pulse 1s infinite;
 }
 
@@ -304,63 +315,187 @@ button:hover{
   100%{ transform:scale(1); opacity:1 }
 }
 
-
-.logo{
-  width:50px;
-  height:50px;
-  border-radius:50%;
-  object-fit:cover;
-  border:2px solid #e5e7eb;
-}
-
+/* ================= POPUP ================= */
 #popupOverlay{
-  display:none;
   position:fixed;
   top:0;
   left:0;
   width:100%;
   height:100%;
-  background:rgba(0,0,0,0.5);
+  background:rgba(0,0,0,0.7);
+  display:none;
   align-items:center;
   justify-content:center;
-  z-index:9999;
 }
 
 #popupOverlay.active{
   display:flex;
 }
 
-.loader{
-  width:16px;
-  height:16px;
-  border:2px solid #ffffff;
-  border-top:2px solid transparent;
-  border-radius:50%;
-  display:none;
-  animation:spin 0.7s linear infinite;
+#popupBox{
+  background:#020617;
+  border-radius:14px;
+  padding:20px;
+  width:350px;
+  max-height:80vh;
+  overflow:auto;
+  border:1px solid var(--border);
 }
 
-@keyframes spin{
-  from{ transform:rotate(0deg); }
-  to{ transform:rotate(360deg); }
+/* ================= RESPONSIVO ================= */
+
+/* TV GRANDE */
+@media (min-width:1400px){
+  .valor{ font-size:32px; }
 }
 
-button.loading{
-  pointer-events:none;
-  opacity:0.7;
+/* TABLET */
+@media (max-width:900px){
+  .grid{
+    grid-template-columns:1fr;
+    grid-template-rows:auto;
+    overflow:auto;
+  }
+
+  html,body{
+    overflow:auto;
+  }
+}
+
+
+
+
+.bola span{
+  font-weight:800;
+}
+
+
+.almoco{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+
+  margin-top:6px;
+  padding:6px;
+  border-radius:8px;
+  background:#020617;
+  font-size:clamp(9px, 1.3vw, 11px);
+  border:1px solid var(--border);
+}
+
+#extra{
+  grid-column: span 3;
+}
+
+#barraResumo{
   display:flex;
   align-items:center;
-  justify-content:center;
+  gap:12px;
+
+  padding:4px 10px;
+  border-radius:8px;
+
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.05);
+
+  font-size:11px;
+  color:#94a3b8;
+
+  backdrop-filter: blur(6px);
+}
+
+/* destaque leve */
+#barraResumo b{
+  color:#22c55e;
+  font-weight:700;
+}.grid{
+  height: calc(100vh - 50px);
+  display:grid;
+  grid-template-columns: 1fr 2fr;
+  gap:8px;
+  padding:8px;
+}
+
+/* 🔵 ESQUERDA (3 LINHAS) */
+.col-esquerda{
+  display:grid;
+  grid-template-rows: repeat(3, 1fr);
   gap:8px;
 }
 
-button.loading #btnText{
+/* 🟢 DIREITA (3 COLUNAS AUTOMÁTICAS) */
+.col-direita{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 1fr;
+  gap:8px;
+}
+/* opcional: esconder extra */
+#extra{
   display:none;
 }
 
-button.loading #btnLoader{
-  display:block;
+
+
+  .grid{
+  height: calc(100vh - 50px);
+  display:grid;
+
+  grid-template-columns: 1fr 2fr; /* esquerda menor, direita maior */
+  grid-template-rows: repeat(3, 1fr);
+
+  gap:8px;
+  padding:8px;
 }
+.right-grid{
+  grid-column:2;
+  grid-row:1 / 4;
+
+  display:grid;
+
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+
+  gap:8px;
+}
+.valor-mes{
+  font-size:clamp(12px, 1.6vw, 16px);
+  font-weight:900;
+  color:#22c55e;
+  letter-spacing:0.5px;
+}
+
+
+
+
+
+.info-box{
+  display:flex;
+  flex-direction:column;
+  margin-top:2px;
+}
+
+.vendas-linha{
+  font-size:11px;
+  color:#94a3b8;
+  line-height:1.2;
+}
+
+.ticket-linha{
+  font-size:11px;
+  color:#94a3b8;
+  line-height:1.2;
+}
+
+.cancel-inline{
+  margin-left:6px;
+  font-size:10px;
+  color:#ef4444;
+  font-weight:700;
+}
+
+    
 </style>
 </head>
 
@@ -368,31 +503,28 @@ button.loading #btnLoader{
 
 <div id="statusDot" class="status-dot"></div>
 <header>
-  <div>PAINEL DV</div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div>CARNEIRO HOLDING</div>
+    <div id="barraResumo"></div>
+  </div>
   <div id="status"></div>
 </header>
 
-<div class="controls">
-<input type="date" id="data">
-<button id="btnAplicar" onclick="reload()">
-  <span id="btnText">Aplicar</span>
-  <span id="btnLoader" class="loader"></span>
-</button></div>
-
-<div id="periodo" style="
-  padding:10px 15px;
-  color:#64748b;
-  font-size:12px;
-"></div>
-
-<!-- KPI TOPO -->
-<div id="kpis"></div>
-
-<!-- GRID -->
+<!-- GRID FIXO TV -->
 <div class="grid">
 
-  <div id="left"></div>
-  <div id="right"></div>
+  <!-- ESQUERDA -->
+  <div id="villa" class="card"></div>
+  <div id="delicia" class="card"></div>
+  <div id="padaria" class="card"></div>
+
+  <!-- DIREITA (GRID INTERNA) -->
+  <div class="right-grid">
+    <div id="restaurante" class="card"></div>
+    <div id="emporio" class="card"></div>
+    <div id="mkids" class="card"></div>
+    <div id="totalMercatto" class="card total-card"></div>
+  </div>
 
 </div>
 
@@ -565,8 +697,43 @@ function parse(v){
   }
 }
 
+
+
+
+
+
+function normalizarFinanceiroEmpresa(nome){
+
+  const n = (nome || "").toUpperCase()
+
+  if(n.includes("VILLA")) return "VILLA"
+
+  if(n.includes("DELICIA") || n.includes("DELÍCIA"))
+    return "DELICIA"
+
+  if(n.includes("PADARIA"))
+    return "PADARIA"
+
+if(n.includes("MERCATTO")){
+  return "MERCATTO RESTAURANTE"
+}
+
+  if(n.includes("KIDS") || n.includes("MKIDS"))
+    return "MKIDS"
+
+  // 🔥 DEBUG (IMPORTANTE)
+  console.log("❌ EMPRESA F360 NÃO MAPEADA:", nome)
+
+  return null
+}
+
+
+
+
+
+  
 // ================= PROCESS =================
-function process(data, inicio, fim){
+function process(data, inicio, fim, financeiro=[]){
 
   const result = {}
 
@@ -681,6 +848,130 @@ if(isAlmoco){
 }
   })
 
+
+// 🔥🔥🔥 COLE EXATAMENTE AQUI 🔥🔥🔥
+const EMPRESAS_BASE = [
+  "VILLA",
+  "DELICIA",
+  "PADARIA",
+  "MERCATTO EMPÓRIO",
+  "MERCATTO RESTAURANTE",
+  "MKIDS"
+]
+
+EMPRESAS_BASE.forEach(emp=>{
+  if(!result[emp]){
+    result[emp] = {
+      total:0,
+      vendas:0,
+      cancelados:0,
+      valorCancelado:0,
+      finais:{},
+      almocoTotal:0,
+      almocoVendas:0
+    }
+  }
+})
+
+
+// ================= FINANCEIRO =================
+
+const hoje = new Date().toISOString().slice(0,10)
+const mesAtual = new Date().getMonth()
+const anoAtual = new Date().getFullYear()
+
+financeiro.forEach(f => {
+
+const empRaw =
+  f.empresa ||
+  f.empresa_nome ||
+  f.nome_empresa ||
+  ""
+
+const emp = normalizarFinanceiroEmpresa(empRaw)
+
+if(!emp){
+  console.log("❌ F360 SEM EMPRESA:", f)
+  return
+}
+
+// 🔥 GARANTE EXISTÊNCIA
+if(!result[emp]){
+  result[emp] = {
+    total:0,
+    vendas:0,
+    cancelados:0,
+    valorCancelado:0,
+    finais:{},
+    almocoTotal:0,
+    almocoVendas:0
+  }
+}
+  const d = result[emp]
+
+  const valor = Number(f.valor || 0)
+  const status = (f.status || "").toUpperCase()
+  const dataVenc = f.vencimento
+
+  if(!dataVenc) return
+
+  const dataObj = new Date(dataVenc)
+  const dataStr = dataObj.toISOString().slice(0,10)
+
+  // ================= HOJE =================
+  if(dataStr === hoje){
+
+    d.finHojeTotal = (d.finHojeTotal || 0) + valor
+
+    if(status.includes("ABERTO")){
+      d.finHojeAberto = (d.finHojeAberto || 0) + valor
+    }
+
+    if(status.includes("PAGO") || status.includes("LIQUIDADO")){
+      d.finHojePago = (d.finHojePago || 0) + valor
+    }
+  }
+
+  // ================= MÊS =================
+  if(
+    dataObj.getMonth() === mesAtual &&
+    dataObj.getFullYear() === anoAtual
+  ){
+
+    if(status.includes("ABERTO")){
+      d.finMesAberto = (d.finMesAberto || 0) + valor
+    }
+
+    if(status.includes("PAGO") || status.includes("LIQUIDADO")){
+      d.finMesPago = (d.finMesPago || 0) + valor
+    }
+  }
+
+  // ================= TRAVA =================
+  const plano = (f.plano_conta || "").toUpperCase()
+
+  const isFornecedor =
+    plano.includes("FORNECEDOR") ||
+    plano.includes("INSUMO") ||
+    plano.includes("BEBIDA") ||
+    plano.includes("HORTI") ||
+    plano.includes("AÇOUGUE") ||
+    plano.includes("FRIOS") ||
+    plano.includes("PEIX") ||
+    plano.includes("SALM")
+
+  if(isFornecedor){
+    d.travaFornecedor = (d.travaFornecedor || 0) + valor
+  }else{
+    d.travaGeral = (d.travaGeral || 0) + valor
+  }
+
+})
+
+
+
+
+  
   return result
 }
 
@@ -714,166 +1005,205 @@ function getMetaEmpresa(nome){
 
   
 // ================= RENDER =================
+
 function render(dados, dadosMes){
 
-  window.dadosCache = dados // 🔥 OBRIGATÓRIO
+  window.dadosCache = dados
 
-  renderKPIs(dados)
+  function montarCard(emp){
 
-const left = document.getElementById("left")
-const right = document.getElementById("right")
+    const d = dados[emp] || {
+      total:0,
+      vendas:0,
+      cancelados:0,
+      valorCancelado:0,
+      almocoTotal:0,
+      almocoVendas:0
+    }
 
-// 🔥 LIMPA ANTES DE RENDERIZAR
-left.innerHTML = ""
-right.innerHTML = ""
-  const ORDEM = [
-    "VILLA",
-    "DELICIA",
-    "PADARIA",
-    "MERCATTO RESTAURANTE",
-    "MERCATTO EMPÓRIO",
-    "MKIDS"
-  ]
-
-  ORDEM.forEach(nomeBusca=>{
-
-const emp = nomeBusca
-const d = dados[emp]
-
-if(!d) return
     const dMes = dadosMes[emp] || { total:0 }
 
-  const card = `
-<div class="card">
+    // ✅ CALCULA FORA DO HTML
+    const ticketMedio = d.vendas > 0 ? d.total / d.vendas : 0
+    const ticketAlmoco = d.almocoVendas > 0 ? d.almocoTotal / d.almocoVendas : 0
 
-  <!-- LINHA 1: LOGO + VALOR + METAS -->
-  <div style="
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-  ">
+return `
+  <div class="card-top">
 
-    <!-- ESQUERDA -->
-    <div style="display:flex;align-items:center;gap:10px">
 
-      <img src="${getLogo(emp)}" class="logo">
+<div style="display:flex;align-items:center;gap:8px">
 
-      <div style="
-        font-size:22px;
-        font-weight:800;
-        color:#16a34a;
-        white-space:nowrap;
-      ">
-        ${brl(d.total)}
-      </div>
+  <img src="${getLogo(emp)}" class="logo">
 
-    </div>
+ <div style="display:flex;flex-direction:column;gap:2px">
 
-    <!-- DIREITA (METAS) -->
-    ${(() => {
-
-      const meta = getMetaEmpresa(emp)
-      if(!meta) return ""
-
-      const pctPrata = Math.min((dMes.total / meta.prata) * 100, 100)
-      const pctOuro = Math.min((dMes.total / meta.ouro) * 100, 100)
-
-      return `
-        <div style="display:flex;gap:10px">
-
-          <div class="bola prata" style="--p:${pctPrata}%">
-            <div class="conteudo-bola">
-              <div>${pctPrata.toFixed(0)}%</div>
-              <small>${brl(meta.prata)}</small>
-            </div>
-          </div>
-
-          <div class="bola ouro" style="--p:${pctOuro}%">
-            <div class="conteudo-bola">
-              <div>${pctOuro.toFixed(0)}%</div>
-              <small>${brl(meta.ouro)}</small>
-            </div>
-          </div>
-
-        </div>
-      `
-    })()}
-
+  <!-- MÊS (maior) -->
+  <div class="valor-mes">
+    ${brl(dMes.total)}
   </div>
 
-  <!-- VENDAS -->
-  <div style="margin-top:10px">${d.vendas} vendas</div>
-
-  <!-- ALMOÇO -->
-  <div style="
-    margin-top:6px;
-    padding:6px;
-    background:#f1f5f9;
-    border-radius:6px;
-    font-size:12px
-  ">
-    🍽️ Almoço: <b>${brl(d.almocoTotal)}</b> (${d.almocoVendas} vendas)
+  <!-- DIA -->
+  <div class="valor">
+    ${brl(d.total)}
   </div>
 
-  <!-- MÊS -->
-  <div style="
-    margin-top:8px;
-    padding:10px;
-    border-radius:10px;
-    background:linear-gradient(135deg,#0f172a,#1e293b);
-    color:#fff;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    font-size:13px;
-    font-weight:600;
-  ">
-    <span style="opacity:0.7">📊 Mês</span>
-    <span style="font-size:15px;font-weight:800;color:#22c55e;">
-      ${brl(dMes.total)}
+<div class="info-box">
+
+  <div class="vendas-linha">
+    ${d.vendas} vendas 
+    <span class="cancel-inline">
+      ❌ ${d.cancelados}
     </span>
   </div>
 
-  <!-- CANCELADOS -->
-  <div style="color:red;font-size:12px">
-    ❌ ${d.cancelados} cancelados (${brl(d.valorCancelado)})
+  <div class="ticket-linha">
+    Ticket: ${brl(ticketMedio)}
   </div>
 
-  <!-- FINAIS -->
-<div style="margin-top:10px;text-align:center">
-  <button onclick="abrirPopup('${emp}')"
-    style="
-      background:#0f172a;
-      color:#fff;
-      border:none;
-      padding:6px 12px;
-      border-radius:8px;
-      font-size:12px;
-      cursor:pointer;
-    ">
-    Ver mais
-  </button>
+</div>
+
+
+
 </div>
 
 </div>
+
+   <div class="metas">
+  ${(() => {
+
+    const meta = getMetaEmpresa(emp)
+    if(!meta) return ""
+
+    const pct1 = Math.min((dMes.total/meta.prata)*100,100)
+    const pct2 = Math.min((dMes.total/meta.ouro)*100,100)
+
+    return `
+      <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+        <div class="bola prata" style="--p:${pct1}%">
+          <span>${pct1.toFixed(0)}%</span>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+        <div class="bola ouro" style="--p:${pct2}%">
+          <span>${pct2.toFixed(0)}%</span>
+        </div>
+      </div>
+
+      <!-- 🔥 AGORA SIM: EMBAIXO DAS BOLAS -->
+<div class="mini-ticket">
+  <div class="mini-label">Ticket Médio</div>
+
+  <div class="mini-valores">
+    <span class="mini-vendas">${d.vendas}</span>
+    <span class="mini-ticket-text">${brl(ticketMedio)}</span>
+  </div>
+</div>
+    `
+  })()}
+</div>
+
+
+
+
+
+<div style="margin-top:6px;padding:6px;border-top:1px solid #1e293b">
+
+  <!-- HOJE -->
+  <div style="font-size:10px;color:#94a3b8">Hoje</div>
+
+  <div style="display:flex;justify-content:space-between;font-size:11px">
+    <span>A pagar</span>
+    <b>${brl(d.finHojeTotal || 0)}</b>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;font-size:11px">
+    <span style="color:#22c55e">Pago</span>
+    <b>${brl(d.finHojePago || 0)}</b>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;font-size:11px">
+    <span style="color:#ef4444">Aberto</span>
+    <b>${brl(d.finHojeAberto || 0)}</b>
+  </div>
+
+  <!-- MÊS -->
+  <div style="font-size:10px;color:#94a3b8;margin-top:6px">Mês</div>
+
+  <div style="display:flex;justify-content:space-between;font-size:11px">
+    <span style="color:#22c55e">Pago</span>
+    <b>${brl(d.finMesPago || 0)}</b>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;font-size:11px">
+    <span style="color:#ef4444">Aberto</span>
+    <b>${brl(d.finMesAberto || 0)}</b>
+  </div>
+
+  <!-- TRAVAS -->
+  <div style="font-size:10px;color:#94a3b8;margin-top:6px">Travas</div>
+
+  <div style="display:flex;justify-content:space-between;font-size:11px">
+    <span style="color:#ef4444">Fornec.</span>
+    <b>${brl(d.travaFornecedor || 0)}</b>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;font-size:11px">
+    <span style="color:#3b82f6">Geral</span>
+    <b>${brl(d.travaGeral || 0)}</b>
+  </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+  </div>
+
 `
-    // 🔥 AQUI É O MAIS IMPORTANTE
-    if(
-      emp.includes("VILLA") ||
-      emp.includes("DELICIA") ||
-      emp.includes("PADARIA")
-    ){
-      left.innerHTML += card
-    }else{
-      right.innerHTML += card
-    }
+  }
 
-  })
+  // 🔥 FIXO NOS CARDS
+  document.getElementById("villa").innerHTML = montarCard("VILLA")
+  document.getElementById("delicia").innerHTML = montarCard("DELICIA")
+  document.getElementById("padaria").innerHTML = montarCard("PADARIA")
+  document.getElementById("restaurante").innerHTML = montarCard("MERCATTO RESTAURANTE")
+  document.getElementById("emporio").innerHTML = montarCard("MERCATTO EMPÓRIO")
 
+  // 🔥 TOTAL MERCATTO
+  const totalMercatto =
+    (dadosMes["MERCATTO EMPÓRIO"]?.total || 0) +
+    (dadosMes["MERCATTO RESTAURANTE"]?.total || 0) +
+    (dadosMes["MKIDS"]?.total || 0)
+
+document.getElementById("totalMercatto").innerHTML = `
+  <div class="titulo">TOTAL MERCATTO</div>
+  <div class="valor">${brl(totalMercatto)}</div>
+`
+
+// 🔥 TOTAL GERAL DO DIA
+let totalDia = 0
+let totalVendas = 0
+
+Object.values(dados).forEach(d=>{
+  totalDia += d.total
+  totalVendas += d.vendas
+})
+
+// 🔥 ATUALIZA BARRA
+const barra = document.getElementById("barraResumo")
+if(barra){
+  barra.innerHTML = `
+    Hoje: <b>${brl(totalDia)}</b> • ${totalVendas} vendas
+  `
 }
-
-
+}
 
 
 function mesOperacional(){
@@ -921,6 +1251,40 @@ function salvarCache(dados, dadosMes){
   }
 
 }
+
+
+
+async function carregarFinanceiro(){
+
+  const hoje = new Date().toISOString().slice(0,10)
+
+  const inicioMes = hoje.slice(0,7) + "-01"
+
+  const { data, error } = await sb
+    .from("f360_parcelas")
+    .select("*")
+    .gte("vencimento", inicioMes)
+    .lte("vencimento", hoje)
+
+  if(error){
+    console.log("❌ ERRO FINANCEIRO:", error)
+    return []
+  }
+
+  console.log("💰 FINANCEIRO CARREGADO:", data?.length)
+
+  return data || []
+}
+
+
+
+
+
+
+
+
+
+  
 // ================= LOAD =================
 async function load(dataSelecionada){
 
@@ -934,11 +1298,7 @@ dot.style.boxShadow = "0 0 10px #f59e0b"
 
 
 let dadosParciais = []
-const left = document.getElementById("left")
-const right = document.getElementById("right")
 
-left.innerHTML = ""
-right.innerHTML = ""
 let from = 0
 const step = 1000
 
@@ -1053,8 +1413,11 @@ if(!usarCacheMes){
 
   while(true){
 
-const dataSelecionada = document.getElementById("data").value
+const inputData = document.getElementById("data")
 
+const dataSelecionada = inputData
+  ? inputData.value
+  : new Date().toISOString().slice(0,10)
 const ano = dataSelecionada.split("-")[0]
 const mesNumero = dataSelecionada.split("-")[1]
 
@@ -1165,8 +1528,18 @@ salvarCache(
 const inicio = new Date(dataSelecionada + "T00:00:00")
 const fim = new Date(dataSelecionada + "T23:59:59")
 
-const finalDados = process(dadosParciais, inicio, fim)
-console.log("📊 FINAL FILTRADO:", finalDados)
+const financeiro = await carregarFinanceiro()
+
+const finalDados = process(
+  dadosParciais,
+  inicio,
+  fim,
+  financeiro
+)
+  
+  
+  
+  console.log("📊 FINAL FILTRADO:", finalDados)
 
 // ✅ AQUI (EXATO)
 if(!window.renderInicializado){
@@ -1183,9 +1556,10 @@ dot.style.background = "#22c55e"
 dot.style.boxShadow = "0 0 10px #22c55e"
 
 console.log("✅ FINALIZADO LOAD")
-document.getElementById("periodo").innerText =
-  `Data: ${dataSelecionada}`
-
+const periodoEl = document.getElementById("periodo")
+if(periodoEl){
+  periodoEl.innerText = `Data: ${dataSelecionada}`
+}
 }
 // ================= RELOAD =================
 async function reload(){
@@ -1242,8 +1616,11 @@ window.addEventListener("DOMContentLoaded", async () => {
   const t = turno()
   const hoje = formatDateOnly(t.inicio)
 
-  document.getElementById("data").value = hoje
+const inputData = document.getElementById("data")
 
+if(inputData){
+  inputData.value = hoje
+}
   console.log("📅 Data automática:", hoje)
 
   await iniciarAutoImport()
@@ -1376,7 +1753,7 @@ function lerJSONSeguro(raw){
 function normalizarEmpresa(empBase, caixa){
 
   const nome = (empBase || "").trim().toUpperCase()
-
+  if(nome.includes("MKIDS")) return "MKIDS"
   if(nome.includes("DELICIA")) return "DELICIA"
   if(nome.includes("VILLA")) return "VILLA"
   if(nome.includes("PADARIA")) return "PADARIA"
@@ -1514,7 +1891,11 @@ localStorage.setItem(STORAGE_KEY, JSON.stringify({
 
 
 
-  function renderKPIs(dados){
+ function renderKPIs(dados){
+
+  const el = document.getElementById("kpis")
+
+  if(!el) return // 🔥 EVITA ERRO
 
   let total = 0
   let vendas = 0
@@ -1526,7 +1907,7 @@ localStorage.setItem(STORAGE_KEY, JSON.stringify({
     cancelados += d.cancelados
   })
 
-  document.getElementById("kpis").innerHTML = `
+  el.innerHTML = `
     <div class="kpi">
       <div class="label">Faturamento</div>
       <div class="value">${brl(total)}</div>
