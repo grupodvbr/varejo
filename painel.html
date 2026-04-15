@@ -1219,10 +1219,7 @@ function formatDateOnly(date){
   return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`
 }
 
-window.addEventListener("DOMContentLoaded", () => {
-  const t = turno()
-  document.getElementById("data").value = formatDateOnly(t.inicio)
-})
+
 // 🔥 AQUI ENTRA O CACHE
 const cache = carregarCache()
 
