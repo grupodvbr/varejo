@@ -94,8 +94,7 @@ export default async function handler(req, res){
     const ids = new Set()
 
     log("📡 INICIANDO PAGINAÇÃO...\n")
-    let paginasSemNovos = 0
-let ultimaPaginaHash = null
+let paginasSemNovos = 0
     // ================= LOOP =================
     while(true){
 
