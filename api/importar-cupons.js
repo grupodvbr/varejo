@@ -270,7 +270,30 @@ await supabase
 
 
   }catch(e){
+    } // 🔥 fecha o for(intervalos)
 
+    // 👉 COLAR AQUI EXATAMENTE
+    const tempoTotal = ((Date.now() - startTotal)/1000).toFixed(2)
+
+    log("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    log("🎉 IMPORTAÇÃO FINALIZADA")
+    log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+
+    log(`🏢 Empresa: ${empresa}`)
+    log(`📅 Período: ${inicio} → ${fim}`)
+
+    log("\n📊 RESUMO:")
+    log(`📥 Total recebido da API: ${totalRecebidos}`)
+    log(`💾 Total inserido REAL: ${totalCupons}`)
+    log(`📉 Diferença: ${totalRecebidos - totalCupons}`)
+    log(`💳 Pagamentos importados: ${totalPagamentos}`)
+    log(`📄 Páginas processadas: ${totalPaginas}`)
+
+    log(`\n⏱ Tempo total: ${tempoTotal}s`)
+
+    res.end()
+
+  }catch(e){
     console.log("💥 ERRO GERAL:", e.message)
     res.write("💥 ERRO: " + e.message)
     res.end()
