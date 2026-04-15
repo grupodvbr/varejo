@@ -404,7 +404,7 @@ const sb = window.supabase.createClient(
   "https://ehxrrpsiksceljmhsfxk.supabase.co",
   "sb_publishable_Jm2ZQKzPS3gNPCKSjFAmYQ_WNMYwF1j"
 )
-
+let idsProcessadosMes = new Set()
 // 🔥 API BASE (COLE EXATAMENTE AQUI)
 const API_URL = window.location.origin.includes("localhost")
   ? "http://localhost:3000"
@@ -1422,11 +1422,50 @@ if(cache.dadosMes){
 
     dadosMesBruto = dadosMesBruto.concat(data)
 
-    const parcial = process(
-      dadosMesBruto,
-      new Date(inicioMes),
-      new Date(fimMes)
-    )
+if(!window.dadosMesCache){
+  window.dadosMesCache = {}
+}
+
+data.forEach(v => {
+
+  const id = v.unique_id
+  if(!id || idsProcessadosMes.has(id)) return
+
+  idsProcessadosMes.add(id)
+
+  const p = parse(v)
+  if(!p || p.cancelado) return
+
+  const emp = (v.empresa_id || "").toUpperCase()
+
+  if(!window.dadosMesCache[emp]){
+    window.dadosMesCache[emp] = {
+      total:0,
+      vendas:0,
+      cancelados:0,
+      valorCancelado:0,
+      finais:{},
+      almocoTotal:0,
+      almocoVendas:0
+    }
+  }
+
+  const d = window.dadosMesCache[emp]
+
+  d.total += p.valor
+  d.vendas++
+
+  const nome = p.finalizadora || "OUTROS"
+  d.finais[nome] = (d.finais[nome] || 0) + p.valor
+
+  // almoço
+  const hora = new Date(p.data).getHours()
+  if(hora >= 10 && hora < 15){
+    d.almocoTotal += p.valor
+    d.almocoVendas++
+  }
+
+})
 
 window.dadosMesCache = parcial
 
