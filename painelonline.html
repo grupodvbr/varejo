@@ -182,15 +182,15 @@ header div:first-child{
   gap:6px 6px;
 }
 
-/* 🔥 mini ticket ocupa linha inteira */
 .mini-ticket{
   grid-column: span 2;
 
   display:flex;
+  flex-direction:column;
+  justify-content:center;
   align-items:center;
-  justify-content:space-between;
 
-  width:76px; /* 🔥 mesmo "peso visual" das 2 bolas */
+  width:76px;
   margin:0 auto;
 
   padding:4px 6px;
@@ -200,7 +200,35 @@ header div:first-child{
   background:rgba(255,255,255,0.03);
   border:1px solid rgba(255,255,255,0.06);
 
+  gap:2px;
+}
+
+/* 🔤 TÍTULO */
+.mini-label{
+  font-size:8px;
+  color:#64748b;
+  font-weight:600;
+  letter-spacing:0.5px;
+}
+
+/* 📊 LINHA DE VALORES */
+.mini-valores{
+  display:flex;
+  justify-content:space-between;
+  width:100%;
   font-size:9px;
+}
+
+/* 👤 VENDAS */
+.mini-vendas{
+  color:#94a3b8;
+  font-weight:700;
+}
+
+/* 💰 TICKET */
+.mini-ticket-text{
+  color:#22c55e;
+  font-weight:800;
 }
 
 /* BOLINHA */
@@ -896,10 +924,14 @@ return `
       </div>
 
       <!-- 🔥 AGORA SIM: EMBAIXO DAS BOLAS -->
-      <div class="mini-ticket">
-        <span>${d.vendas}</span>
-        <span>${brl(ticketMedio)}</span>
-      </div>
+<div class="mini-ticket">
+  <div class="mini-label">Ticket Médio</div>
+
+  <div class="mini-valores">
+    <span class="mini-vendas">${d.vendas} vendas</span>
+    <span class="mini-ticket-text">${brl(ticketMedio)}</span>
+  </div>
+</div>
     `
   })()}
 </div>
