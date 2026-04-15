@@ -423,14 +423,30 @@ header div:first-child{
   letter-spacing:0.5px;
 }
 
-.info-linha{
+
+
+
+
+.info-box{
+  display:flex;
+  flex-direction:column;
+  margin-top:2px;
+}
+
+.vendas-linha{
   font-size:11px;
   color:#94a3b8;
-  display:flex;
-  gap:6px;
-  align-items:center;
-  white-space:nowrap; /* 🔥 impede quebrar linha na TV */
+  line-height:1.2;
 }
+
+.ticket-linha{
+  font-size:11px;
+  color:#94a3b8;
+  line-height:1.2;
+}
+
+
+
     
 </style>
 </head>
@@ -824,10 +840,17 @@ return `
     ${brl(d.total)}
   </div>
 
-  <!-- VENDAS + TICKET NA MESMA LINHA -->
-  <div class="info-linha">
-    ${d.vendas} vendas • Ticket ${brl(ticketMedio)}
+<div class="info-box">
+  <div class="vendas-linha">
+    ${d.vendas} vendas
   </div>
+  <div class="ticket-linha">
+    Ticket: ${brl(ticketMedio)}
+  </div>
+</div>
+
+
+
 
 </div>
 
