@@ -320,7 +320,28 @@ header div:first-child{
   grid-column: span 3;
 }
 
+#barraResumo{
+  display:flex;
+  align-items:center;
+  gap:12px;
 
+  padding:4px 10px;
+  border-radius:8px;
+
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.05);
+
+  font-size:11px;
+  color:#94a3b8;
+
+  backdrop-filter: blur(6px);
+}
+
+/* destaque leve */
+#barraResumo b{
+  color:#22c55e;
+  font-weight:700;
+}
     
 </style>
 </head>
@@ -329,7 +350,10 @@ header div:first-child{
 
 <div id="statusDot" class="status-dot"></div>
 <header>
-  <div>PAINEL DV</div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div>PAINEL DV</div>
+    <div id="barraResumo"></div>
+  </div>
   <div id="status"></div>
 </header>
 
@@ -775,9 +799,25 @@ return `
     (dadosMes["MERCATTO RESTAURANTE"]?.total || 0) +
     (dadosMes["MKIDS"]?.total || 0)
 
-  document.getElementById("totalMercatto").innerHTML = `
-    <div class="titulo">TOTAL MERCATTO</div>
-    <div class="valor">${brl(totalMercatto)}</div>
+document.getElementById("totalMercatto").innerHTML = `
+  <div class="titulo">TOTAL MERCATTO</div>
+  <div class="valor">${brl(totalMercatto)}</div>
+`
+
+// 🔥 TOTAL GERAL DO DIA
+let totalDia = 0
+let totalVendas = 0
+
+Object.values(dados).forEach(d=>{
+  totalDia += d.total
+  totalVendas += d.vendas
+})
+
+// 🔥 ATUALIZA BARRA
+const barra = document.getElementById("barraResumo")
+if(barra){
+  barra.innerHTML = `
+    Hoje: <b>${brl(totalDia)}</b> • ${totalVendas} vendas
   `
 }
 
