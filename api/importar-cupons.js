@@ -91,14 +91,14 @@ export default async function handler(req, res){
     let totalPagamentos = 0
     let totalPaginas = 0
 
-    const ids = new Set()
+    ids.add(unique_id)
 
     log("📡 INICIANDO PAGINAÇÃO...\n")
 let paginasSemNovos = 0
     // ================= LOOP =================
     while(true){
 
-const url = `${baseURL}?pagina=${pagina}&count=${count}&q=datahora=ge=${inicio}T00:00:00;datahora=le=${fim}T23:59:59`
+      const url = `${baseURL}?pagina=${pagina}&count=${count}&q=data=ge=${inicio};data=le=${fim}`
       const t0 = Date.now()
 
       let response
@@ -106,12 +106,12 @@ const url = `${baseURL}?pagina=${pagina}&count=${count}&q=datahora=ge=${inicio}T
       // 🔁 RETRY INTELIGENTE
       for(let tentativa=1; tentativa<=3; tentativa++){
         try{
-          response = await fetch(url,{
-            headers:{
-              Authorization: token,
-              Accept:"application/json"
-            }
-          })
+response = await fetch(url,{
+  headers:{
+    Authorization: `Bearer ${token}`,
+    Accept:"application/json"
+  }
+})
           if(response.ok) break
         }catch(e){}
 
@@ -160,7 +160,7 @@ paginasSemNovos = 0
       const inserts = []
       const pagamentos = []
 
-      for(const cupom of items){
+      for(const cupom of novos){
 
         const unique_id = empresa + "_" + cupom.id
 
