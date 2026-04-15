@@ -72,8 +72,10 @@ header div:first-child{
 .grid{
   height: calc(100vh - 50px);
   display:grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: repeat(3, 1fr);
+
+  grid-template-columns: repeat(3, 1fr); /* 🔥 3 COLUNAS */
+  grid-template-rows: repeat(3, 1fr);    /* 🔥 3 LINHAS */
+
   gap:10px;
   padding:10px;
 }
@@ -323,17 +325,15 @@ header div:first-child{
 <!-- GRID FIXO TV -->
 <div class="grid">
 
-  <!-- LINHA 1 -->
   <div id="villa" class="card"></div>
   <div id="restaurante" class="card"></div>
-
-  <!-- LINHA 2 -->
   <div id="delicia" class="card"></div>
-  <div id="emporio" class="card"></div>
 
-  <!-- LINHA 3 -->
+  <div id="emporio" class="card"></div>
   <div id="padaria" class="card"></div>
   <div id="totalMercatto" class="card total-card"></div>
+
+  <div id="extra" class="card"></div> <!-- 🔥 NOVO CARD -->
 
 </div>
 
