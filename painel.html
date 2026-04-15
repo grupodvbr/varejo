@@ -1370,22 +1370,6 @@ function lerJSONSeguro(raw){
     return null
   }
 }
-function normalizarEmpresa(empBase, caixa){
-
-  const nome = (empBase || "").trim().toUpperCase()
-
-  if(nome.includes("DELICIA")) return "DELICIA"
-  if(nome.includes("VILLA")) return "VILLA"
-  if(nome.includes("PADARIA")) return "PADARIA"
-
-  if(nome.includes("MERCATTO")){
-    if(caixa >= 1 && caixa <= 5) return "MERCATTO EMPÓRIO"
-    if(caixa >= 6) return "MERCATTO RESTAURANTE"
-  }
-
-  return nome
-}
-
 
 
 async function carregarMesBackground(dataSelecionada){
