@@ -1,4 +1,5 @@
-const { createClient } = require("@supabase/supabase-js")
+import { createClient } from "@supabase/supabase-js"
+
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE
@@ -93,31 +94,13 @@ export default async function handler(req, res){
     const ids = new Set()
 
     log("📡 INICIANDO PAGINAÇÃO...\n")
-
-
-    const intervalos = [
-  ["00:00:00","05:59:59"],
-  ["06:00:00","11:59:59"],
-  ["12:00:00","17:59:59"],
-  ["18:00:00","23:59:59"]
-]
-
-    
      let paginaSemNovos = 0
 let ultimaPaginaHash = null
-let totalRecebidos = 0
-    
     // ================= LOOP =================
-for(const [horaInicio, horaFim] of intervalos){
+    while(true){
 
-  log(`🕒 Intervalo: ${horaInicio} → ${horaFim}`)
+      const url = `${baseURL}?pagina=${pagina}&count=${count}&q=data=ge=${inicio};data=le=${fim}`
 
-  let pagina = 1
-  let paginaSemNovos = 0
-
-  while(true){
-
-    const url = `${baseURL}?pagina=${pagina}&count=${count}&q=dataHora=ge=${inicio}T${horaInicio};dataHora=le=${fim}T${horaFim}`
       const t0 = Date.now()
 
       let response
@@ -125,14 +108,12 @@ for(const [horaInicio, horaFim] of intervalos){
       // 🔁 RETRY INTELIGENTE
       for(let tentativa=1; tentativa<=3; tentativa++){
         try{
-const authToken = token.startsWith("Bearer") ? token : `Bearer ${token}`
-
-response = await fetch(url,{
-  headers:{
-    Authorization: authToken,
-    Accept:"application/json"
-  }
-})
+          response = await fetch(url,{
+            headers:{
+              Authorization: token,
+              Accept:"application/json"
+            }
+          })
           if(response.ok) break
         }catch(e){}
 
@@ -149,22 +130,25 @@ if(!response || !response.ok){
 
       const json = await response.json()
       const items = json.items || []
-      totalRecebidos += items.length
+
       log(`📄 Página ${pagina} | Itens: ${items.length} | Tempo: ${tempoReq}s`)
 
 if(items.length === 0){
-  paginaSemNovos++
+  log("🏁 Última página vazia - FIM")
+  break
+}
 
-  log(`⚠️ Página vazia (${paginaSemNovos})`)
+// 🔍 Detecta repetição de página (API bug comum)
+const paginaHash = JSON.stringify(items.map(i => i.id))
 
-  if(paginaSemNovos >= 3){
-    log("🏁 Fim real detectado")
-    break
-  }
-
+if(paginaHash === ultimaPaginaHash){
+  log("⚠️ Página repetida - pulando...")
   pagina++
   continue
 }
+
+ultimaPaginaHash = paginaHash
+
       const inserts = []
       const pagamentos = []
 
@@ -225,19 +209,16 @@ if(inserts.length > 0){
 
     const chunk = inserts.slice(i, i + chunkSize)
 
-const { data: inserted, error } = await supabase
-  .from("cupons_importados")
-  .upsert(chunk, { onConflict:"unique_id" })
-  .select("unique_id")
+    const { error } = await supabase
+      .from("cupons_importados")
+      .upsert(chunk, { onConflict:"unique_id" })
 
-if(error){
-  log("❌ ERRO INSERT LOTE: " + error.message)
-}else{
-  const qtdReal = inserted?.length || 0
-  totalCupons += qtdReal
-
-  log(`✅ Inseridos REAL: ${qtdReal}`)
-}
+    if(error){
+      log("❌ ERRO INSERT LOTE: " + error.message)
+    }else{
+      totalCupons += chunk.length
+    }
+  }
 
   const tempoInsert = ((Date.now() - tInsert)/1000).toFixed(2)
 
@@ -261,39 +242,45 @@ await supabase
 
       totalPaginas++
 
-
+if(pagina > 10){
+  log("⛔ Limite de segurança (10 páginas)")
+  break
+}
 
       pagina++
 
       await new Promise(r => setTimeout(r, 120))
     }
 
-
-  }catch(e){
-    } // 🔥 fecha o for(intervalos)
-
-    // 👉 COLAR AQUI EXATAMENTE
     const tempoTotal = ((Date.now() - startTotal)/1000).toFixed(2)
 
     log("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    log("🎉 IMPORTAÇÃO FINALIZADA")
+log("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+log("🎉 IMPORTAÇÃO FINALIZADA")
+log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+
+log(`🏢 Empresa: ${empresa}`)
+log(`📅 Período: ${inicio} → ${fim}`)
+
+log("\n📊 RESUMO:")
+log(`🧾 Cupons importados: ${totalCupons}`)
+log(`💳 Pagamentos importados: ${totalPagamentos}`)
+log(`📄 Páginas processadas: ${totalPaginas}`)
+
+log(`\n⏱ Tempo total: ${tempoTotal}s`)
+
+log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+  
+  log(`📊 Total cupons: ${totalCupons}`)
+    log(`💳 Total pagamentos: ${totalPagamentos}`)
+    log(`📄 Total páginas: ${totalPaginas}`)
+    log(`⏱ Tempo total: ${tempoTotal}s`)
     log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-
-    log(`🏢 Empresa: ${empresa}`)
-    log(`📅 Período: ${inicio} → ${fim}`)
-
-    log("\n📊 RESUMO:")
-    log(`📥 Total recebido da API: ${totalRecebidos}`)
-    log(`💾 Total inserido REAL: ${totalCupons}`)
-    log(`📉 Diferença: ${totalRecebidos - totalCupons}`)
-    log(`💳 Pagamentos importados: ${totalPagamentos}`)
-    log(`📄 Páginas processadas: ${totalPaginas}`)
-
-    log(`\n⏱ Tempo total: ${tempoTotal}s`)
 
     res.end()
 
   }catch(e){
+
     console.log("💥 ERRO GERAL:", e.message)
     res.write("💥 ERRO: " + e.message)
     res.end()
