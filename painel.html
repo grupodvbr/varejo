@@ -1357,165 +1357,8 @@ if(!carregandoMes){
 dot.classList.remove("loading")
 dot.style.background = "#22c55e"
 dot.style.boxShadow = "0 0 10px #22c55e"
-// ================= FINANCEIRO ISOLADO =================
-setTimeout(async () => {
 
- 
-// ================= RELOAD =================
-async function reload(){
-
-  const btn = document.getElementById("btnAplicar")
-  const data = document.getElementById("data").value
-
-  btn.classList.add("loading")
-
-  await new Promise(r => setTimeout(r, 150)) // 🔥 suaviza UX
-
-  try{
-    await load(data)
-  }catch(e){
-    console.error(e)
-  }
-
-  btn.classList.remove("loading")
-}
-
-// ================= START =================
-const t = turno()
-
-function formatLocal(date){
-  const pad = n => String(n).padStart(2,"0")
-
-  return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
-}
-function formatDateOnly(date){
-  const pad = n => String(n).padStart(2,"0")
-  return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`
-}
-
-
-// 🔥 AQUI ENTRA O CACHE
-const cache = carregarCache()
-
-window.renderInicializado = false
-
-if(cache){
-
-  const diff = Date.now() - new Date(cache.atualizadoEm).getTime()
-
-  if(diff < 1000 * 60 * 10 && !window.renderInicializado){
-    console.log("⚡ CACHE RECENTE CARREGADO")
-    render(cache.dados || {}, cache.dadosMes || {})
-    window.renderInicializado = true
-  }
-}
-
-// 🔄 SEMPRE CARREGA DO BANCO DEPOIS
-window.addEventListener("DOMContentLoaded", async () => {
-
-  const t = turno()
-  const hoje = formatDateOnly(t.inicio)
-
-const inputData = document.getElementById("data")
-
-if(inputData){
-  inputData.value = hoje
-}
-  console.log("📅 Data automática:", hoje)
-
-  await iniciarAutoImport()
-  await load(hoje)
-
-})
-
-
-  
-let carregando = false
-
-// ================= AUTO IMPORTAÇÃO =================
-
-// 🔥 LISTA DE EMPRESAS
-const EMPRESAS = [
-  "VAREJO_URL_MERCATTO",
-  "VAREJO_URL_VILLA",
-  "VAREJO_URL_PADARIA",
-  "VAREJO_URL_DELICIA"
-]
-
-// 🔥 CONTROLE
-let executandoImport = false
-
-// 🔥 FUNÇÃO PRINCIPAL
-async function rodarImportacaoAutomatica(){
-
-  const hoje = new Date().toISOString().slice(0,10)
-
-  console.log("🚀 AUTO IMPORTAÇÃO:", hoje)
-
-  const dot = document.getElementById("statusDot")
-  dot.classList.add("loading")
-
-  for(const empresa of EMPRESAS){
-
-    try{
-
-      document.getElementById("status").innerText =
-        "Importando: " + empresa
-
-      await fetch(API_URL + "/api/importar-cupons",{
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-          empresa,
-          dataInicio: hoje,
-          dataFim: hoje
-        })
-      })
-
-    }catch(e){
-      console.error("❌ ERRO:", empresa, e.message)
-    }
-
-    await new Promise(r => setTimeout(r, 1500))
-  }
-
-  document.getElementById("status").innerText =
-    "Atualizado: " + new Date().toLocaleTimeString()
-
-  dot.classList.remove("loading")
-
-  console.log("✅ CICLO FINALIZADO")
-}
-
-// 🔥 EXECUÇÃO SEGURA
-async function iniciarAutoImport(){
-
-  if(executandoImport){
-    console.log("⏳ Já rodando...")
-    return
-  }
-
-  executandoImport = true
-
-  try{
-    await rodarImportacaoAutomatica()
-  }catch(e){
-    console.error("💥 ERRO:", e.message)
-  }
-
-  executandoImport = false
-}
-
-// 🔥 RODA AO ABRIR
-iniciarAutoImport()
-
-// 🔁 LOOP 10 MINUTOS
-setInterval(() => {
-  iniciarAutoImport()
-}, 5 * 60 * 1000) // a cada 5 min
-
+} // ✅ FECHA A FUNÇÃO LOAD
   
 function lerJSONSeguro(raw){
 
@@ -1861,6 +1704,65 @@ if(venc < inicioDia || venc > fimDia) return
   }
 }
 }, 100)
+
+// ================= RELOAD =================
+async function reload(){
+  const btn = document.getElementById("btnAplicar")
+  const data = document.getElementById("data").value
+
+  btn.classList.add("loading")
+
+  await new Promise(r => setTimeout(r, 150))
+
+  try{
+    await load(data)
+  }catch(e){
+    console.error(e)
+  }
+
+  btn.classList.remove("loading")
+}
+
+// ================= FORMAT =================
+function formatLocal(date){
+  const pad = n => String(n).padStart(2,"0")
+  return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
+}
+
+function formatDateOnly(date){
+  const pad = n => String(n).padStart(2,"0")
+  return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`
+}
+
+// ================= START =================
+window.addEventListener("DOMContentLoaded", async () => {
+
+  const t = turno()
+  const hoje = formatDateOnly(t.inicio)
+
+  const inputData = document.getElementById("data")
+  if(inputData){
+    inputData.value = hoje
+  }
+
+  console.log("📅 Data automática:", hoje)
+
+  await iniciarAutoImport()
+  await load(hoje)
+
+})
+
+// 🔁 LOOP AUTO IMPORT
+setInterval(() => {
+  iniciarAutoImport()
+}, 5 * 60 * 1000)
+
+
+
+
+
+
+  
 </script>
 
 
