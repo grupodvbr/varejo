@@ -2,25 +2,30 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>IMPORTAÇÃO PROFISSIONAL</title>
-
+<title>PAINEL DV</title>
+  
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-
-<style>
+  
+  <style>
 
 :root{
   --bg:#f1f5f9;
   --card:#ffffff;
-  --border:#e2e8f0;
+  --primary:#2563eb;
+  --success:#16a34a;
+  --danger:#ef4444;
+  --warning:#f59e0b;
+  --dark:#0f172a;
   --text:#0f172a;
   --sub:#64748b;
-  --green:#16a34a;
-  --blue:#2563eb;
-  --yellow:#f59e0b;
-  --red:#ef4444;
 }
 
-/* BASE */
+*{
+  box-sizing:border-box;
+}
+
 body{
   margin:0;
   font-family:Inter;
@@ -28,339 +33,1608 @@ body{
   color:var(--text);
 }
 
-/* HEADER */
+/* ================= HEADER ================= */
 header{
-  padding:15px;
-  background:#ffffff;
-  border-bottom:1px solid var(--border);
+  background:var(--dark);
+  color:#fff;
+  padding:20px;
   display:flex;
-  gap:10px;
+  justify-content:space-between;
   align-items:center;
   position:sticky;
   top:0;
   z-index:10;
 }
 
-input{
-  padding:10px;
-  border-radius:6px;
-  border:1px solid var(--border);
-  font-size:14px;
+header div:first-child{
+  font-size:18px;
+  font-weight:800;
+  letter-spacing:0.5px;
+}
+
+#status{
+  font-size:12px;
+  opacity:0.7;
+}
+
+/* ================= CONTROLS ================= */
+.controls{
+  padding:15px;
   background:#fff;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  border-bottom:1px solid #e5e7eb;
+}
+
+input,button{
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid #e5e7eb;
+  font-size:13px;
 }
 
 button{
-  padding:10px 14px;
-  border-radius:6px;
-  border:none;
-  background:var(--green);
-  color:white;
+  background:var(--primary);
+  color:#fff;
   font-weight:700;
   cursor:pointer;
+  transition:0.2s;
 }
 
 button:hover{
-  background:#22c55e;
+  opacity:0.9;
 }
 
-/* GRID */
-.grid{
+/* ================= KPI ================= */
+#kpis{
   display:grid;
-  grid-template-columns:1fr 1fr;
-  grid-template-rows:1fr 1fr;
-  height:calc(100vh - 70px);
-  gap:12px;
-  padding:12px;
+  grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+  gap:15px;
+  padding:15px;
 }
 
-/* CARD */
-.card{
-  background:var(--card);
-  border-radius:12px;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-  box-shadow:0 4px 20px rgba(0,0,0,0.05);
-  border:1px solid var(--border);
+.kpi{
+  background:linear-gradient(180deg,#fff,#f8fafc);
+  border-radius:14px;
+  padding:18px;
+  box-shadow:0 8px 25px rgba(0,0,0,0.06);
 }
 
-/* HEADER CARD */
-.card-header{
-  padding:14px;
-  font-weight:700;
-  font-size:16px;
-  border-bottom:1px solid var(--border);
-  display:flex;
-  justify-content:space-between;
-}
-
-/* STATUS */
-.status{
-  font-size:13px;
+.kpi .label{
+  font-size:12px;
   color:var(--sub);
 }
 
-/* KPI */
-.kpi{
-  display:flex;
-  justify-content:space-between;
-  padding:10px 14px;
-  font-size:13px;
-  border-bottom:1px solid var(--border);
-}
-
-.kpi div{
-  display:flex;
-  flex-direction:column;
-}
-
-.kpi span{
+.kpi .value{
+  font-size:22px;
   font-weight:800;
-  font-size:18px;
-  color:var(--green);
+  margin-top:5px;
 }
 
-/* PROGRESS */
-.progress{
-  height:6px;
-  background:#e2e8f0;
+/* ================= GRID ================= */
+.grid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:20px;
+  padding:20px;
 }
 
-.bar{
-  height:100%;
-  width:0%;
-  background:linear-gradient(90deg,#16a34a,#22c55e);
+/* ================= CARD ================= */
+.card{
+  background:linear-gradient(180deg,#ffffff,#f8fafc);
+  border-radius:16px;
+  padding:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.08);
+  transition:all 0.2s ease;
+  position:relative;
+}
+
+.card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 20px 40px rgba(0,0,0,0.12);
+}
+
+.empresa{
+  font-size:13px;
+  color:var(--sub);
+  font-weight:700;
+  margin-bottom:6px;
+}
+
+.valor{
+  font-size:30px;
+  font-weight:800;
+  color:var(--success);
   transition:0.3s;
 }
 
-/* LOG */
-.log{
-  flex:1;
-  overflow:auto;
-  padding:12px;
-  font-family:monospace;
-  font-size:13px;
-  background:#f8fafc;
-  line-height:1.5;
+/* ================= LISTA ================= */
+.item{
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+  margin-top:4px;
+  border-bottom:1px dashed #e5e7eb;
+  padding-bottom:2px;
 }
 
-/* LINHAS */
-.line{ margin-bottom:4px; }
+/* ================= METAS ================= */
+.metas{
+  display:flex;
+  gap:20px;
+  margin-top:12px;
+}
 
-.info{ color:var(--blue) }
-.success{ color:var(--green) }
-.warn{ color:var(--yellow) }
-.error{ color:var(--red) }
-.highlight{ color:#ca8a04; font-weight:700 }
-.sep{ color:var(--sub) }
+.bola{
+  width:70px;
+  height:70px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+}
+.conteudo-bola{
+  position:relative;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  font-size:13px;
+  font-weight:800;
+  text-align:center;
+}
 
+.conteudo-bola small{
+  font-size:9px;
+  font-weight:600;
+  margin-top:2px;
+}
+
+    
+.bola::before{
+  content:"";
+  position:absolute;
+  width:52px;
+  height:52px;
+  background:#fff;
+  border-radius:50%;
+}
+.bola span{
+  position:relative;
+  z-index:2;
+}
+
+/* PRATA */
+.prata{
+  background:conic-gradient(#2563eb var(--p), #e5e7eb 0);
+}
+
+/* OURO */
+.ouro{
+  background:conic-gradient(#eab308 var(--p), #e5e7eb 0);
+}
+
+/* ================= BADGES ================= */
+.badge{
+  display:inline-block;
+  padding:4px 8px;
+  border-radius:6px;
+  font-size:11px;
+  font-weight:700;
+  margin-top:6px;
+}
+
+.badge-success{
+  background:#dcfce7;
+  color:#166534;
+}
+
+.badge-danger{
+  background:#fee2e2;
+  color:#991b1b;
+}
+
+.badge-warning{
+  background:#fef3c7;
+  color:#92400e;
+}
+
+/* ================= BOXES ================= */
+.box{
+  margin-top:8px;
+  padding:10px;
+  border-radius:10px;
+  font-size:12px;
+}
+
+.box-gray{
+  background:#f1f5f9;
+}
+
+.box-dark{
+  background:linear-gradient(135deg,#0f172a,#1e293b);
+  color:#fff;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+/* ================= LOADING ================= */
+#loading{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+  z-index:999;
+}
+
+
+
+
+.status-dot{
+  width:12px;
+  height:12px;
+  border-radius:50%;
+  background:#22c55e;
+  position:fixed;
+  top:15px;
+  right:15px;
+  box-shadow:0 0 10px #22c55e;
+  z-index:999;
+  transition:0.3s;
+}
+.status-dot.loading{
+  background:#f59e0b;
+  box-shadow:0 0 10px #f59e0b;
+  animation:pulse 1s infinite;
+}
+
+@keyframes pulse{
+  0%{ transform:scale(1); opacity:1 }
+  50%{ transform:scale(1.3); opacity:0.5 }
+  100%{ transform:scale(1); opacity:1 }
+}
+
+
+.logo{
+  width:50px;
+  height:50px;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid #e5e7eb;
+}
+
+#popupOverlay{
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.5);
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+
+#popupOverlay.active{
+  display:flex;
+}
+
+.loader{
+  width:16px;
+  height:16px;
+  border:2px solid #ffffff;
+  border-top:2px solid transparent;
+  border-radius:50%;
+  display:none;
+  animation:spin 0.7s linear infinite;
+}
+
+@keyframes spin{
+  from{ transform:rotate(0deg); }
+  to{ transform:rotate(360deg); }
+}
+
+button.loading{
+  pointer-events:none;
+  opacity:0.7;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+
+button.loading #btnText{
+  display:none;
+}
+
+button.loading #btnLoader{
+  display:block;
+}
 </style>
 </head>
 
 <body>
 
+<div id="statusDot" class="status-dot"></div>
 <header>
-
-<label>Data início:</label>
-<input type="date" id="dataInicio">
-
-<label>Data fim:</label>
-<input type="date" id="dataFim">
-
-<button onclick="executarTudo()">🚀 Executar Tudo</button>
-
+  <div>PAINEL DV</div>
+  <div id="status"></div>
 </header>
 
+<div class="controls">
+<input type="date" id="data">
+<button id="btnAplicar" onclick="reload()">
+  <span id="btnText">Aplicar</span>
+  <span id="btnLoader" class="loader"></span>
+</button></div>
+
+<div id="periodo" style="
+  padding:10px 15px;
+  color:#64748b;
+  font-size:12px;
+"></div>
+
+<!-- KPI TOPO -->
+<div id="kpis"></div>
+
+<!-- GRID -->
 <div class="grid">
 
-<!-- CARDS (mantidos iguais) -->
-<div class="card">
-  <div class="card-header">
-    MERCATTO
-    <span class="status" id="status_MERCATTO">Aguardando</span>
-  </div>
-
-  <div class="kpi">
-    <div>💰 Total<span id="total_MERCATTO">R$ 0,00</span></div>
-    <div>📅 Dia<span id="dia_MERCATTO">-</span></div>
-  </div>
-
-  <div class="progress"><div class="bar" id="bar_MERCATTO"></div></div>
-  <div class="log" id="log_MERCATTO"></div>
-</div>
-
-<div class="card">
-  <div class="card-header">
-    VILLA
-    <span class="status" id="status_VILLA">Aguardando</span>
-  </div>
-
-  <div class="kpi">
-    <div>💰 Total<span id="total_VILLA">R$ 0,00</span></div>
-    <div>📅 Dia<span id="dia_VILLA">-</span></div>
-  </div>
-
-  <div class="progress"><div class="bar" id="bar_VILLA"></div></div>
-  <div class="log" id="log_VILLA"></div>
-</div>
-
-<div class="card">
-  <div class="card-header">
-    PADARIA
-    <span class="status" id="status_PADARIA">Aguardando</span>
-  </div>
-
-  <div class="kpi">
-    <div>💰 Total<span id="total_PADARIA">R$ 0,00</span></div>
-    <div>📅 Dia<span id="dia_PADARIA">-</span></div>
-  </div>
-
-  <div class="progress"><div class="bar" id="bar_PADARIA"></div></div>
-  <div class="log" id="log_PADARIA"></div>
-</div>
-
-<div class="card">
-  <div class="card-header">
-    DELÍCIA
-    <span class="status" id="status_DELICIA">Aguardando</span>
-  </div>
-
-  <div class="kpi">
-    <div>💰 Total<span id="total_DELICIA">R$ 0,00</span></div>
-    <div>📅 Dia<span id="dia_DELICIA">-</span></div>
-  </div>
-
-  <div class="progress"><div class="bar" id="bar_DELICIA"></div></div>
-  <div class="log" id="log_DELICIA"></div>
-</div>
+  <div id="left"></div>
+  <div id="right"></div>
 
 </div>
+
 
 <script>
 
-const empresas = [
-  {nome:"MERCATTO", value:"VAREJO_URL_MERCATTO"},
-  {nome:"VILLA", value:"VAREJO_URL_VILLA"},
-  {nome:"PADARIA", value:"VAREJO_URL_PADARIA"},
-  {nome:"DELICIA", value:"VAREJO_URL_DELICIA"}
+// ================= SUPABASE =================
+const sb = window.supabase.createClient(
+  "https://ehxrrpsiksceljmhsfxk.supabase.co",
+  "sb_publishable_Jm2ZQKzPS3gNPCKSjFAmYQ_WNMYwF1j"
+)
+let idsProcessadosMes = new Set()
+// 🔥 API BASE (COLE EXATAMENTE AQUI)
+const API_URL = window.location.origin.includes("localhost")
+  ? "http://localhost:3000"
+  : window.location.origin
+
+  
+const STORAGE_KEY = "painel_dv_cache"
+let carregandoMes = false
+// ================= MAPA ORIGINAL =================
+const MAPA_ORIGINAL = {
+  VAREJO_URL_DELICIA: [
+  { id: "1", descricao: "DINHEIRO" },
+  { id: "2", descricao: "CARTAO DE CREDITO" },
+  { id: "3", descricao: "CARTAO DE DEBITO" },
+  { id: "4", descricao: "CONSUMO FUNCIONARIOS" },
+  { id: "5", descricao: "CREDIARIO CLIENTES" },
+  { id: "7", descricao: "VOUCHER" },
+  { id: "8", descricao: "PAGAMENTOS ONLINE" },
+  { id: "10", descricao: "CONSUMO MUSICOS" },
+  { id: "11", descricao: "CREDITO POS" },
+  { id: "12", descricao: "DEBITO POS" },
+  { id: "13", descricao: "CLIENTES EM DEBITO" },
+  { id: "14", descricao: "BOLETO BANCARIO" },
+  { id: "15", descricao: "CHEQUE" },
+  { id: "16", descricao: "BONIFICACAO" },
+  { id: "21", descricao: "PIX QRCODE" },
+  { id: "22", descricao: "PIX CNPJ" },
+  { id: "23", descricao: "CREDITO DELIVERY" },
+  { id: "24", descricao: "DEBITO DELIVERY" },
+  { id: "27", descricao: "VOUCHER POS" },
+  { id: "28", descricao: "VOUCHER DELICIA" },
+  { id: "29", descricao: "CONSUMO SOCIO" }
+],
+  VAREJO_URL_VILLA: [
+  { id: "1", descricao: "DINHEIRO" },
+  { id: "2", descricao: "CARTAO DE DEBITO" },
+  { id: "3", descricao: "CARTAO DE CREDITO" },
+  { id: "4", descricao: "CREDIARIO CLIENTES" },
+  { id: "5", descricao: "CONSUMO FUNCIONARIOS" },
+  { id: "6", descricao: "VOUCHER" },
+  { id: "7", descricao: "CONSUMO MUSICOS" },
+  { id: "8", descricao: "ERROS LANCAMENTOS" },
+  { id: "9", descricao: "CLIENTES EM DEBITO" },
+  { id: "10", descricao: "PAGAMENTOS ONLINE" },
+  { id: "11", descricao: "TRANSFERENCIA BANCAR" },
+  { id: "12", descricao: "PIX" },
+  { id: "13", descricao: "CHEQUE" },
+  { id: "14", descricao: "BOLETO BANCARIO" },
+  { id: "15", descricao: "CREDITO ANTECIPADO" },
+  { id: "16", descricao: "PAGAMENTO ANTECIPADO" },
+  { id: "17", descricao: "CATALOGO DELIVERY" },
+  { id: "18", descricao: "CART CREDITO POS" },
+  { id: "19", descricao: "CART DEBITO POS" },
+  { id: "20", descricao: "PIX ITAU" },
+  { id: "22", descricao: "PIX POS" },
+  { id: "23", descricao: "VOUCHER POS" },
+  { id: "24", descricao: "BONIFICACAO" },
+  { id: "25", descricao: "CONSUMO SOCIO" },
+  { id: "26", descricao: "ERROS GARCONS" },
+  { id: "27", descricao: "BONIFICACAO GERENCIA" },
+  { id: "28", descricao: "CARTAO DEBITO VCH" },
+  { id: "29", descricao: "CARTAO CREDITO VCH" },
+  { id: "30", descricao: "PIX ITAU VCH" }
+],
+  VAREJO_URL_PADARIA: [
+  { id: "1", descricao: "DINHEIRO" },
+  { id: "2", descricao: "CARTAO DE CREDITO" },
+  { id: "3", descricao: "CARTAO DE DEBITO" },
+  { id: "4", descricao: "PIX" },
+  { id: "5", descricao: "BOLETO" },
+  { id: "6", descricao: "CONSUMO FUNCIONARIOS" },
+  { id: "8", descricao: "CARTAO VOUCHER" },
+  { id: "10", descricao: "CREDITO DELIVERY" },
+  { id: "11", descricao: "DEBITO DELIVERY" },
+  { id: "12", descricao: "PIX OFFLINE" },
+  { id: "13", descricao: "PAGAMENTO ONLINE" },
+  { id: "14", descricao: "CONSUMO SOCIO" },
+  { id: "15", descricao: "VOUCHER POS" },
+  { id: "", descricao: "SEM FATURAMENTO" }
+],
+  VAREJO_URL_MERCATTO: [
+  { "id": "1", "descricao": "DINHEIRO" },
+  { "id": "2", "descricao": "CARTAO CREDITO TEF" },
+  { "id": "3", "descricao": "CARTAO DEBITO TEF" },
+  { "id": "4", "descricao": "PIX CNPJ" },
+  { "id": "5", "descricao": "CONSUMO FUNCIONARIOS" },
+  { "id": "6", "descricao": "REFEICAO ALIME. TEF" },
+  { "id": "7", "descricao": "TOTEM CREDITO" },
+  { "id": "8", "descricao": "TOTEM DEBITO" },
+  { "id": "9", "descricao": "BONIFICACAO" },
+  { "id": "10", "descricao": "BOLETO" },
+  { "id": "11", "descricao": "PGTO ONLINE CREDITO" },
+  { "id": "15", "descricao": "PIX QRCODE POS" },
+  { "id": "16", "descricao": "PIX TEF" },
+  { "id": "17", "descricao": "CREDITO POS" },
+  { "id": "18", "descricao": "DEBITO POS" },
+  { "id": "19", "descricao": "CART ALIMENTACAO POS" },
+  { "id": "20", "descricao": "BOLETO FAMILY PRODUT" },
+  { "id": "21", "descricao": "BOLETO FOODS TIME" },
+  { "id": "22", "descricao": "BOLETO DELICIA PRODU" },
+  { "id": "23", "descricao": "BOLETO MEOS GOURMET" },
+  { "id": "24", "descricao": "BOLETO ALL TIME CHOP" },
+  { "id": "25", "descricao": "BOLETO MERCATTO KIDS" },
+  { "id": "26", "descricao": "CREDIARIO CLIENTES" },
+  { "id": "27", "descricao": "CONSUMO SOCIO" },
+  { "id": "28", "descricao": "BOLETO DELICIA INDUS" },
+  { "id": "29", "descricao": "VOUCHER" },
+  { "id": "32", "descricao": "PAGAMENTO ONLINE" },
+  { "id": "33", "descricao": "VOUCHER POS" },
+  { "id": "34", "descricao": "MARKETING" },
+  { "id": "35", "descricao": "VALE MERCATTO" },
+  { "id": "36", "descricao": "PREJUIZO" }
 ]
-
-// LOG
-function addLog(nome, text){
-
-  const logDiv = document.getElementById("log_"+nome)
-
-  const el = document.createElement("div")
-  el.classList.add("line")
-
-  if(text.includes("❌")) el.classList.add("error")
-  else if(text.includes("⚠️")) el.classList.add("warn")
-  else if(text.includes("✅")) el.classList.add("success")
-  else if(text.includes("📊")) el.classList.add("highlight")
-  else if(text.includes("━━")) el.classList.add("sep")
-  else el.classList.add("info")
-
-  el.textContent = text
-
-  logDiv.appendChild(el)
-  logDiv.scrollTop = logDiv.scrollHeight
-
-  atualizarKPI(nome, text)
 }
 
-// KPI
-function atualizarKPI(nome, linha){
+// ================= TRANSFORMA MAPA =================
+const MAPA = {}
 
-  if(linha.includes("🧾 Cupom")){
-    const valor = linha.match(/R\$ ([\d\.]+)/)
-    if(valor){
+Object.keys(MAPA_ORIGINAL).forEach(emp=>{
+  MAPA[emp] = {}
+  MAPA_ORIGINAL[emp].forEach(f=>{
+    MAPA[emp][Number(f.id)] = f.descricao
+  })
+})
 
-      let atual = Number(
-        document.getElementById("total_"+nome).innerText
-        .replace("R$","")
-        .replace(/\./g,"")
-        .replace(",",".")
-      ) || 0
+// ================= FORMAT =================
+const brl = v => Number(v).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})
 
-      atual += Number(valor[1])
+// ================= TURNO =================
+function turno(){
 
-      const el = document.getElementById("total_"+nome)
+  const agora = new Date()
 
-      el.innerText = atual.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})
+  const inicio = new Date(agora)
+  inicio.setHours(5,0,0,0)
 
-      // 🔥 ANIMAÇÃO
-      el.style.transform = "scale(1.1)"
-      setTimeout(()=> el.style.transform="scale(1)",150)
-    }
+  // se ainda não chegou 05:00 → volta 1 dia
+  if(agora.getHours() < 5){
+    inicio.setDate(inicio.getDate() - 1)
   }
 
-  if(linha.includes("Período")){
-    const d = linha.split("→")[0].split(":")[1]
-    if(d){
-      document.getElementById("dia_"+nome).innerText = d.trim()
-    }
+  const fim = new Date(inicio)
+  fim.setDate(fim.getDate() + 1)
+  fim.setHours(4,59,59,999)
+
+  return { inicio, fim }
+}
+
+// ================= PARSE =================
+function parse(v){
+  return {
+    data: new Date(`${v.data}T${v.hora || "00:00:00"}`),
+    valor: Number(v.valor_liquido ?? 0),
+    finalizadora: v.finalizadora || "OUTROS",
+    cancelado: v.cancelado,
+    caixa: Number(v.caixa || 0),
+    id: v.unique_id
   }
 }
 
-// EXECUÇÃO
-async function executarEmpresa(emp){
+// ================= PROCESS =================
+function process(data, inicio, fim){
 
-  const nome = emp.nome
-  const status = document.getElementById("status_"+nome)
-  const bar = document.getElementById("bar_"+nome)
+  const result = {}
 
-  document.getElementById("log_"+nome).innerHTML = ""
-  document.getElementById("total_"+nome).innerText = "R$ 0,00"
-  document.getElementById("dia_"+nome).innerText = "-"
+data.forEach(v=>{
 
-  bar.style.width = "0%"
-  status.innerText = "Executando..."
+const dataVenda = new Date(
+  new Date(`${v.data}T${v.hora || "00:00:00"}`)
+    .toLocaleString("en-US", { timeZone: "America/Bahia" })
+)
 
-  const response = await fetch("/api/importar-cupons",{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body: JSON.stringify({
-      empresa: emp.value,
-      dataInicio: document.getElementById("dataInicio").value,
-      dataFim: document.getElementById("dataFim").value
-    })
+const inicioBahia = new Date(
+  inicio.toLocaleString("en-US", { timeZone: "America/Bahia" })
+)
+
+const fimBahia = new Date(
+  fim.toLocaleString("en-US", { timeZone: "America/Bahia" })
+)
+
+if(dataVenda < inicioBahia || dataVenda > fimBahia) return
+
+  
+  
+const p = parse(v)
+if(!p) return
+
+
+const id = v.unique_id
+  if(!id) return
+
+
+const d = new Date(p.data)
+
+const dLocal = new Date(
+  d.toLocaleString("en-US", { timeZone: "America/Bahia" })
+)
+const hora = dLocal.getHours()
+const isAlmoco = hora >= 10 && hora < 15
+
+
+
+const dataHora = new Date(
+  new Date(`${v.data}T${v.hora || "00:00:00"}`)
+    .toLocaleString("en-US", { timeZone: "America/Bahia" })
+)
+
+
+
+// 🔥 DATA PURA (IGUAL SQL)
+const dataRegistro = v.data
+
+const dataInicio = inicio.toISOString().split("T")[0]
+const dataFim = fim.toISOString().split("T")[0]
+
+
+    
+   const empBase = v.empresa_id
+const caixa = p.caixa
+
+function normalizarEmpresa(empBase, caixa){
+
+  const nome = (empBase || "").trim().toUpperCase()
+
+  if(nome.includes("DELICIA")) return "DELICIA"
+  if(nome.includes("VILLA")) return "VILLA"
+  if(nome.includes("PADARIA")) return "PADARIA"
+
+  if(nome.includes("MERCATTO")){
+    if(caixa >= 1 && caixa <= 5) return "MERCATTO EMPÓRIO"
+    if(caixa >= 6) return "MERCATTO RESTAURANTE"
+  }
+
+  return nome
+}
+
+const emp = normalizarEmpresa(empBase, caixa)
+  
+    if(!result[emp]){
+      result[emp]={
+total:0,
+vendas:0,
+cancelados:0,
+valorCancelado:0,
+finais:{},
+
+// 🔥 NOVO
+almocoTotal:0,
+almocoVendas:0
+      }
+    }
+
+    // 🔴 CANCELADOS
+    if(p.cancelado){
+      result[emp].cancelados++
+      result[emp].valorCancelado += p.valor
+      return
+    }
+
+    // ✅ VÁLIDOS
+const totalCupom = p.valor
+
+const nome = p.finalizadora || "OUTROS"
+
+result[emp].finais[nome] =
+  (result[emp].finais[nome] || 0) + p.valor
+
+    
+    result[emp].total += totalCupom
+    result[emp].vendas++
+if(isAlmoco){
+  result[emp].almocoTotal += totalCupom
+  result[emp].almocoVendas++
+}
   })
 
-  const reader = response.body.getReader()
-  const decoder = new TextDecoder()
+  return result
+}
 
-  let buffer = ""
-  let progresso = 0
 
-  while(true){
-    const { done, value } = await reader.read()
-    if(done) break
 
-    buffer += decoder.decode(value)
+// ================= METAS =================
+const METAS = {
+  "DELÍCIA": { prata: 545000, ouro: 575000 },
+  "VILLA": { prata: 746600, ouro: 833000 },
+  "PADARIA": { prata: 720000, ouro: 750000 },
+  "MERCATTO RESTAURANTE": { prata: 850000, ouro: 900000 },
+  "MERCATTO EMPÓRIO": { prata: 650000, ouro: 690000 }
+}
 
-    const linhas = buffer.split("\n")
-    buffer = linhas.pop()
 
-    linhas.forEach(linha=>{
-      if(linha.trim()){
-        addLog(nome,linha)
+function getMetaEmpresa(nome){
 
-        progresso += 2
-        if(progresso > 100) progresso = 100
-        bar.style.width = progresso + "%"
-      }
-    })
+  if(nome.includes("VILLA")) return METAS["VILLA"]
+  if(nome.includes("PADARIA")) return METAS["PADARIA"]
+  if(nome.includes("DELICIA")) return METAS["DELÍCIA"]
+  if(nome.includes("RESTAURANTE")) return METAS["MERCATTO RESTAURANTE"]
+  if(nome.includes("EMPÓRIO")) return METAS["MERCATTO EMPÓRIO"]
+
+  return null
+}
+  
+
+
+
+
+
+  
+// ================= RENDER =================
+function render(dados, dadosMes){
+
+  window.dadosCache = dados // 🔥 OBRIGATÓRIO
+
+  renderKPIs(dados)
+
+const left = document.getElementById("left")
+const right = document.getElementById("right")
+
+// 🔥 LIMPA ANTES DE RENDERIZAR
+left.innerHTML = ""
+right.innerHTML = ""
+  const ORDEM = [
+    "VILLA",
+    "DELICIA",
+    "PADARIA",
+    "MERCATTO RESTAURANTE",
+    "MERCATTO EMPÓRIO",
+    "MKIDS"
+  ]
+
+  ORDEM.forEach(nomeBusca=>{
+
+const emp = nomeBusca
+const d = dados[emp]
+
+if(!d) return
+    const dMes = dadosMes[emp] || { total:0 }
+
+  const card = `
+<div class="card">
+
+  <!-- LINHA 1: LOGO + VALOR + METAS -->
+  <div style="
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  ">
+
+    <!-- ESQUERDA -->
+    <div style="display:flex;align-items:center;gap:10px">
+
+      <img src="${getLogo(emp)}" class="logo">
+
+      <div style="
+        font-size:22px;
+        font-weight:800;
+        color:#16a34a;
+        white-space:nowrap;
+      ">
+        ${brl(d.total)}
+      </div>
+
+    </div>
+
+    <!-- DIREITA (METAS) -->
+    ${(() => {
+
+      const meta = getMetaEmpresa(emp)
+      if(!meta) return ""
+
+      const pctPrata = Math.min((dMes.total / meta.prata) * 100, 100)
+      const pctOuro = Math.min((dMes.total / meta.ouro) * 100, 100)
+
+      return `
+        <div style="display:flex;gap:10px">
+
+          <div class="bola prata" style="--p:${pctPrata}%">
+            <div class="conteudo-bola">
+              <div>${pctPrata.toFixed(0)}%</div>
+              <small>${brl(meta.prata)}</small>
+            </div>
+          </div>
+
+          <div class="bola ouro" style="--p:${pctOuro}%">
+            <div class="conteudo-bola">
+              <div>${pctOuro.toFixed(0)}%</div>
+              <small>${brl(meta.ouro)}</small>
+            </div>
+          </div>
+
+        </div>
+      `
+    })()}
+
+  </div>
+
+  <!-- VENDAS -->
+  <div style="margin-top:10px">${d.vendas} vendas</div>
+
+  <!-- ALMOÇO -->
+  <div style="
+    margin-top:6px;
+    padding:6px;
+    background:#f1f5f9;
+    border-radius:6px;
+    font-size:12px
+  ">
+    🍽️ Almoço: <b>${brl(d.almocoTotal)}</b> (${d.almocoVendas} vendas)
+  </div>
+
+  <!-- MÊS -->
+  <div style="
+    margin-top:8px;
+    padding:10px;
+    border-radius:10px;
+    background:linear-gradient(135deg,#0f172a,#1e293b);
+    color:#fff;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:13px;
+    font-weight:600;
+  ">
+    <span style="opacity:0.7">📊 Mês</span>
+    <span style="font-size:15px;font-weight:800;color:#22c55e;">
+      ${brl(dMes.total)}
+    </span>
+  </div>
+
+  <!-- CANCELADOS -->
+  <div style="color:red;font-size:12px">
+    ❌ ${d.cancelados} cancelados (${brl(d.valorCancelado)})
+  </div>
+
+  <!-- FINAIS -->
+<div style="margin-top:10px;text-align:center">
+  <button onclick="abrirPopup('${emp}')"
+    style="
+      background:#0f172a;
+      color:#fff;
+      border:none;
+      padding:6px 12px;
+      border-radius:8px;
+      font-size:12px;
+      cursor:pointer;
+    ">
+    Ver mais
+  </button>
+</div>
+
+</div>
+`
+    // 🔥 AQUI É O MAIS IMPORTANTE
+    if(
+      emp.includes("VILLA") ||
+      emp.includes("DELICIA") ||
+      emp.includes("PADARIA")
+    ){
+      left.innerHTML += card
+    }else{
+      right.innerHTML += card
+    }
+
+  })
+
+}
+
+
+
+
+function mesOperacional(){
+
+  const now = new Date()
+
+  const inicio = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    1,
+    4,0,0,0
+  )
+
+  const fim = new Date()
+
+  return { inicio, fim }
+}
+
+
+
+function salvarCache(dados, dadosMes){
+
+  const payload = {
+    dados,
+    dadosMes,
+    atualizadoEm: new Date().toISOString()
   }
 
-  bar.style.width = "100%"
-  status.innerText = "Finalizado"
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(payload))
+
 }
 
-async function executarTudo(){
-  await Promise.all(empresas.map(e => executarEmpresa(e)))
+
+
+  function carregarCache(){
+
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if(!raw) return null
+
+    return JSON.parse(raw)
+
+  }catch(e){
+    return null
+  }
+
+}
+// ================= LOAD =================
+async function load(dataSelecionada){
+
+console.log("🚀 INICIANDO LOAD")
+
+const dot = document.getElementById("statusDot")
+
+dot.classList.add("loading")
+dot.style.background = "#f59e0b"
+dot.style.boxShadow = "0 0 10px #f59e0b"
+
+
+let dadosParciais = []
+const left = document.getElementById("left")
+const right = document.getElementById("right")
+
+left.innerHTML = ""
+right.innerHTML = ""
+let from = 0
+const step = 1000
+
+// 🔥 CACHE DO MÊS
+window.dadosMesCache = {}
+
+let lastDate = null
+let lastId = null
+while(true){
+
+  await new Promise(r => requestAnimationFrame(r))
+
+
+let query = sb
+  .from("resumo_vendas")
+  .select("*")
+  .gte("data", dataSelecionada)
+  .lte("data", dataSelecionada)
+  .eq("cancelado", false)
+  .order("data", { ascending: true })
+  .order("id", { ascending: true })
+  .limit(step)
+
+  // 🔥 CURSOR REAL
+if(lastDate){
+  query = query.or(
+    `data.gt.${lastDate},and(data.eq.${lastDate},id.gt.${lastId})`
+  )
 }
 
+  const { data, error } = await query
+if(error){
+  console.error("❌ ERRO PAGINA:", error)
+const mes = mesOperacional()
+  const cache = carregarCache()
+
+
+  
+if(!window.renderInicializado){
+  render(cache.dados || {}, cache.dadosMes || {})
+  window.renderInicializado = true
+}
+
+  return // 🔥 PARA TUDO
+}
+
+  if(!data || data.length === 0){
+    console.log("⛔ FIM PAGINAÇÃO")
+    break
+  }
+lastDate = data[data.length - 1].data
+lastId = data[data.length - 1].id
+  console.log(`📄 PAGINA ${from} → ${from + step} | ITENS: ${data.length}`)
+
+dadosParciais = dadosParciais.concat(data)
+const inicio = new Date(dataSelecionada + "T00:00:00")
+const fim = new Date(dataSelecionada + "T23:59:59")
+
+const parcial = process(dadosParciais, inicio, fim)
+salvarCache(parcial, window.dadosMesCache || {})
+
+// 🔥 RENDER PROGRESSIVO
+render(parcial, window.dadosMesCache || {})
+
+  
+  if(data.length < step){
+    console.log("🏁 ÚLTIMA PÁGINA")
+    break
+  }
+
+  from += step
+}
+// 🔥 FINAL
+console.log("📊 TOTAL CARREGADO:", dadosParciais.length)
+
+// 🔥 MÊS (usa os mesmos dados já carregados)
+const cache = carregarCache()
+
+let usarCacheMes = false
+
+if(cache?.dadosMes && cache?.atualizadoEm){
+  const diff = Date.now() - new Date(cache.atualizadoEm).getTime()
+
+  if(diff < 1000 * 60 * 30){ // 🔥 30 MIN
+    usarCacheMes = true
+    console.log("⚡ USANDO CACHE DO MÊS")
+    window.dadosMesCache = cache.dadosMes
+  }
+}
+
+
+  
+let dadosMesBruto = cache?.dadosMesBruto || []
+  let fromMes = 0
+const stepMes = 300
+
+// 🔥 VERIFICA CACHE (30 MIN)
+if(cache?.dadosMes && cache?.atualizadoEm){
+  const diff = Date.now() - new Date(cache.atualizadoEm).getTime()
+
+  if(diff < 1000 * 60 * 30){
+    usarCacheMes = true
+    console.log("⚡ USANDO CACHE DO MÊS")
+    window.dadosMesCache = cache.dadosMes
+  }
+}
+
+const mes = mesOperacional()
+
+// 🔥 SÓ BUSCA SE NÃO TEM CACHE
+if(!usarCacheMes){
+
+  while(true){
+
+const dataSelecionada = document.getElementById("data").value
+
+const ano = dataSelecionada.split("-")[0]
+const mesNumero = dataSelecionada.split("-")[1]
+
+// 🔥 INICIO DO MÊS
+const inicioMes = `${ano}-${mesNumero}-01`
+// 🔥 FIM DO MÊS (dinâmico)
+const fimMes = new Date(ano, Number(mesNumero), 0)
+  .toISOString()
+  .split("T")[0]
+
+const { data, error } = await sb
+  .from("resumo_vendas")
+  .select("*")
+  .gte("data", inicioMes)
+  .lte("data", fimMes)
+  .eq("cancelado", false)
+  .order("data", { ascending: true })
+  .range(fromMes, fromMes + stepMes - 1)
+
+    
+
+    // 🔴 ERRO → USA CACHE E NÃO QUEBRA
+    if(error){
+      console.error("❌ ERRO MES:", error)
+
+      if(cache?.dadosMes){
+        console.log("⚡ FALLBACK CACHE")
+        window.dadosMesCache = cache.dadosMes
+      }
+
+      break
+    }
+
+    if(!data || data.length === 0){
+      console.log("⛔ FIM PAGINAÇÃO MÊS")
+      break
+    }
+
+    console.log(`📊 MÊS PAGINA ${fromMes} → ${fromMes + stepMes} | ${data.length}`)
+
+    dadosMesBruto = dadosMesBruto.concat(data)
+
+    // 🔥 PROCESSA PARCIAL
+    const parcialMes = process(
+      dadosMesBruto.map(v => ({
+        ...v,
+        raw: lerJSONSeguro(v.raw)
+      })),
+      mes.inicio,
+      mes.fim
+    )
+
+    // 🔥 ATUALIZA EM TEMPO REAL
+    window.dadosMesCache = parcialMes
+
+    // 🔥 SALVA PROGRESSIVO
+    salvarCache(
+      window.dadosCache || {},
+      parcialMes
+    )
+
+    if(data.length < stepMes){
+      console.log("🏁 ÚLTIMA PÁGINA MÊS")
+      break
+    }
+
+    fromMes += stepMes
+  }
+
+  // 🔥 FINALIZA (SÓ SE TEM DADOS)
+  if(dadosMesBruto.length > 0){
+
+    const dadosMesTratado = dadosMesBruto.map(v => ({
+      ...v,
+      raw: lerJSONSeguro(v.raw)
+    }))
+
+    const dadosMes = process(dadosMesTratado, mes.inicio, mes.fim)
+
+    window.dadosMesCache = dadosMes
+
+    const cacheAtual = carregarCache()
+
+    salvarCache(
+      cacheAtual?.dados || {},
+      dadosMes
+    )
+  }
+}
+
+const dadosMesTratado = (dadosMesBruto || [])
+let dadosMes = window.dadosMesCache || {}
+
+if(Object.keys(dadosMes).length === 0){
+  dadosMes = cache?.dadosMes || {}
+}
+
+// 🔥 SALVA CACHE
+window.dadosMesCache = dadosMes
+
+const cacheAtual = carregarCache()
+
+salvarCache(
+  cacheAtual?.dados || {},
+  dadosMes
+)
+// 🔥 RENDER FINAL COMPLETO
+const inicio = new Date(dataSelecionada + "T00:00:00")
+const fim = new Date(dataSelecionada + "T23:59:59")
+
+const finalDados = process(dadosParciais, inicio, fim)
+console.log("📊 FINAL FILTRADO:", finalDados)
+
+// ✅ AQUI (EXATO)
+if(!window.renderInicializado){
+  render(finalDados, dadosMes)
+  window.renderInicializado = true
+}
+if(!carregandoMes){
+  carregandoMes = true
+  carregarMesBackground(dataSelecionada)
+}  
+// 🔥 FINALIZA LOADING
+dot.classList.remove("loading")
+dot.style.background = "#22c55e"
+dot.style.boxShadow = "0 0 10px #22c55e"
+
+console.log("✅ FINALIZADO LOAD")
+document.getElementById("periodo").innerText =
+  `Data: ${dataSelecionada}`
+
+}
+// ================= RELOAD =================
+async function reload(){
+
+  const btn = document.getElementById("btnAplicar")
+  const data = document.getElementById("data").value
+
+  btn.classList.add("loading")
+
+  await new Promise(r => setTimeout(r, 150)) // 🔥 suaviza UX
+
+  try{
+    await load(data)
+  }catch(e){
+    console.error(e)
+  }
+
+  btn.classList.remove("loading")
+}
+
+// ================= START =================
+const t = turno()
+
+function formatLocal(date){
+  const pad = n => String(n).padStart(2,"0")
+
+  return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
+}
+function formatDateOnly(date){
+  const pad = n => String(n).padStart(2,"0")
+  return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`
+}
+
+
+// 🔥 AQUI ENTRA O CACHE
+const cache = carregarCache()
+
+window.renderInicializado = false
+
+if(cache){
+
+  const diff = Date.now() - new Date(cache.atualizadoEm).getTime()
+
+  if(diff < 1000 * 60 * 10 && !window.renderInicializado){
+    console.log("⚡ CACHE RECENTE CARREGADO")
+    render(cache.dados || {}, cache.dadosMes || {})
+    window.renderInicializado = true
+  }
+}
+
+// 🔄 SEMPRE CARREGA DO BANCO DEPOIS
+window.addEventListener("DOMContentLoaded", async () => {
+
+  const t = turno()
+  const hoje = formatDateOnly(t.inicio)
+
+  document.getElementById("data").value = hoje
+
+  console.log("📅 Data automática:", hoje)
+
+  await iniciarAutoImport()
+  await load(hoje)
+
+})
+
+
+  
+let carregando = false
+
+// ================= AUTO IMPORTAÇÃO =================
+
+// 🔥 LISTA DE EMPRESAS
+const EMPRESAS = [
+  "VAREJO_URL_MERCATTO",
+  "VAREJO_URL_VILLA",
+  "VAREJO_URL_PADARIA",
+  "VAREJO_URL_DELICIA"
+]
+
+// 🔥 CONTROLE
+let executandoImport = false
+
+// 🔥 FUNÇÃO PRINCIPAL
+async function rodarImportacaoAutomatica(){
+
+  const hoje = new Date().toISOString().slice(0,10)
+
+  console.log("🚀 AUTO IMPORTAÇÃO:", hoje)
+
+  const dot = document.getElementById("statusDot")
+  dot.classList.add("loading")
+
+  for(const empresa of EMPRESAS){
+
+    try{
+
+      document.getElementById("status").innerText =
+        "Importando: " + empresa
+
+      await fetch(API_URL + "/api/importar-cupons",{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+          empresa,
+          dataInicio: hoje,
+          dataFim: hoje
+        })
+      })
+
+    }catch(e){
+      console.error("❌ ERRO:", empresa, e.message)
+    }
+
+    await new Promise(r => setTimeout(r, 1500))
+  }
+
+  document.getElementById("status").innerText =
+    "Atualizado: " + new Date().toLocaleTimeString()
+
+  dot.classList.remove("loading")
+
+  console.log("✅ CICLO FINALIZADO")
+}
+
+// 🔥 EXECUÇÃO SEGURA
+async function iniciarAutoImport(){
+
+  if(executandoImport){
+    console.log("⏳ Já rodando...")
+    return
+  }
+
+  executandoImport = true
+
+  try{
+    await rodarImportacaoAutomatica()
+  }catch(e){
+    console.error("💥 ERRO:", e.message)
+  }
+
+  executandoImport = false
+}
+
+// 🔥 RODA AO ABRIR
+iniciarAutoImport()
+
+// 🔁 LOOP 10 MINUTOS
+setInterval(() => {
+  iniciarAutoImport()
+}, 5 * 60 * 1000) // a cada 5 min
+
+  
+function lerJSONSeguro(raw){
+
+  try{
+
+    // já é objeto → retorna direto
+    if(typeof raw === "object"){
+      return raw
+    }
+
+    // não é string → inválido
+    if(typeof raw !== "string"){
+      return null
+    }
+
+    // 1º parse
+    let parsed = JSON.parse(raw)
+
+    // se ainda for string → parse de novo
+    if(typeof parsed === "string"){
+      parsed = JSON.parse(parsed)
+    }
+
+    return parsed
+
+  }catch(e){
+    console.log("❌ ERRO AO LER JSON:", e.message)
+    console.log("📦 RAW PROBLEMÁTICO:", raw)
+    return null
+  }
+}
+
+
+
+function normalizarEmpresa(empBase, caixa){
+
+  const nome = (empBase || "").trim().toUpperCase()
+
+  if(nome.includes("DELICIA")) return "DELICIA"
+  if(nome.includes("VILLA")) return "VILLA"
+  if(nome.includes("PADARIA")) return "PADARIA"
+
+  if(nome.includes("MERCATTO")){
+    if(caixa >= 1 && caixa <= 5) return "MERCATTO EMPÓRIO"
+    if(caixa >= 6) return "MERCATTO RESTAURANTE"
+  }
+
+  return nome
+}
+
+  
+
+async function carregarMesBackground(dataSelecionada){
+
+  console.log("🚀 INICIANDO BACKGROUND MÊS")
+
+  const cache = carregarCache() || {}
+
+  let dadosMesCache = cache.dadosMes || {}
+  let ultimaPagina = cache.ultimaPaginaMes || 0
+
+  const step = 300
+  let from = ultimaPagina
+
+  const ano = dataSelecionada.split("-")[0]
+  const mesNumero = dataSelecionada.split("-")[1]
+
+  const inicioMes = `${ano}-${mesNumero}-01`
+  const fimMes = new Date(ano, Number(mesNumero), 0)
+    .toISOString()
+    .split("T")[0]
+
+let dadosMesBruto = cache?.dadosMesBruto || []
+if(cache.dadosMes){
+  console.log("⚡ CONTINUANDO DO CACHE")
+}
+  
+  while(true){
+
+    const { data, error } = await sb
+      .from("resumo_vendas")
+      .select("*")
+      .gte("data", inicioMes)
+      .lte("data", fimMes)
+      .eq("cancelado", false)
+      .order("data", { ascending: true })
+      .range(from, from + step - 1)
+
+    if(error){
+      console.log("❌ ERRO BACKGROUND:", error)
+      break
+    }
+
+    if(!data || data.length === 0){
+      console.log("🏁 FIM BACKGROUND")
+      break
+    }
+
+    dadosMesBruto = dadosMesBruto.concat(data)
+
+if(!window.dadosMesCache){
+  window.dadosMesCache = {}
+}
+
+data.forEach(v => {
+
+  const id = v.unique_id
+  if(!id || idsProcessadosMes.has(id)) return
+
+  idsProcessadosMes.add(id)
+
+  const p = parse(v)
+  if(!p || p.cancelado) return
+
+const emp = normalizarEmpresa(v.empresa_id, Number(v.caixa || 0))
+  if(!window.dadosMesCache[emp]){
+    window.dadosMesCache[emp] = {
+      total:0,
+      vendas:0,
+      cancelados:0,
+      valorCancelado:0,
+      finais:{},
+      almocoTotal:0,
+      almocoVendas:0
+    }
+  }
+
+  const d = window.dadosMesCache[emp]
+
+  d.total += p.valor
+  d.vendas++
+
+  const nome = p.finalizadora || "OUTROS"
+  d.finais[nome] = (d.finais[nome] || 0) + p.valor
+
+  // almoço
+  const hora = new Date(p.data).getHours()
+  if(hora >= 10 && hora < 15){
+    d.almocoTotal += p.valor
+    d.almocoVendas++
+  }
+
+})
+
+// 🔥 ATUALIZA TELA EM TEMPO REAL
+if(window.dadosCache){
+  render(window.dadosCache, window.dadosMesCache)
+}
+
+// 🔥 SUAVIZA LOOP
+await new Promise(r => setTimeout(r, 30))
+
+// 🔥 SALVA CACHE CORRETO
+localStorage.setItem(STORAGE_KEY, JSON.stringify({
+  dados: cache.dados || {},
+  dadosMes: window.dadosMesCache,
+  ultimaPaginaMes: from + step,
+  atualizadoEm: new Date().toISOString()
+}))
+
+    console.log("💾 SALVANDO MÊS:", from)
+
+    from += step
+
+    // 🔥 não travar UI
+    await new Promise(r => setTimeout(r, 50))
+  }
+
+  console.log("✅ BACKGROUND FINALIZADO")
+}
+
+
+
+
+
+  function renderKPIs(dados){
+
+  let total = 0
+  let vendas = 0
+  let cancelados = 0
+
+  Object.values(dados).forEach(d=>{
+    total += d.total
+    vendas += d.vendas
+    cancelados += d.cancelados
+  })
+
+  document.getElementById("kpis").innerHTML = `
+    <div class="kpi">
+      <div class="label">Faturamento</div>
+      <div class="value">${brl(total)}</div>
+    </div>
+
+    <div class="kpi">
+      <div class="label">Vendas</div>
+      <div class="value">${vendas}</div>
+    </div>
+
+    <div class="kpi">
+      <div class="label">Cancelamentos</div>
+      <div class="value">${cancelados}</div>
+    </div>
+  `
+}
+
+function getLogo(emp){
+
+  if(emp.includes("VILLA")) return "logo/villa.png"
+  if(emp.includes("DELICIA")) return "logo/delicia.png"
+  if(emp.includes("PADARIA")) return "logo/padaria.png"
+  if(emp.includes("RESTAURANTE")) return "logo/mercatto.png"
+  if(emp.includes("EMPÓRIO")) return "logo/mercatto.png"
+  if(emp.includes("MKIDS")) return "logo/mercatto.png"
+
+  return ""
+}
+let popupAtual = null
+
+function abrirPopup(emp){
+
+  popupAtual = emp
+
+  const overlay = document.getElementById("popupOverlay")
+  const content = document.getElementById("popupContent")
+
+  const dados = window.dadosCache?.[emp]
+  if(!dados) return
+
+  content.innerHTML = Object.entries(dados.finais)
+    .sort((a,b)=>b[1]-a[1])
+    .map(f=>`
+      <div style="
+        display:flex;
+        justify-content:space-between;
+        padding:6px 0;
+        border-bottom:1px solid #eee;
+        font-size:13px;
+      ">
+        <span>${f[0]}</span>
+        <b>${brl(f[1])}</b>
+      </div>
+    `).join("")
+
+  overlay.style.display = "flex"
+  overlay.classList.add("active")
+}
+
+
+
+const popupEl = document.getElementById("popupOverlay")
+
+if(popupEl){
+  popupEl.addEventListener("click",(e)=>{
+    if(e.target.id === "popupOverlay"){
+      popupEl.style.display = "none"
+      popupEl.classList.remove("active")
+    }
+  })
+}
+  
+
+
+
+
+
+  
 </script>
+<div id="popupOverlay" style="
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.5);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+">
 
+  <div id="popupBox" style="
+    background:white;
+    border-radius:16px;
+    padding:20px;
+    width:90%;
+    max-width:400px;
+    max-height:80vh;
+    overflow:auto;
+  ">
+    <div style="font-weight:800;margin-bottom:10px">Finalizadoras</div>
+    <div id="popupContent"></div>
+  </div>
+
+</div>
+
+
+  
 </body>
 </html>
