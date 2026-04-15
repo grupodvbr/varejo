@@ -1238,8 +1238,12 @@ if(cache){
 }
 
 // 🔄 SEMPRE CARREGA DO BANCO DEPOIS
-await iniciarAutoImport()
-await load(document.getElementById("data").value)
+;(async () => {
+
+  await iniciarAutoImport()
+  await load(document.getElementById("data").value)
+
+})()
 let carregando = false
 
 // ================= AUTO IMPORTAÇÃO =================
