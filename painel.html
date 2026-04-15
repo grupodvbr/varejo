@@ -945,9 +945,17 @@ return `
 
   </div>
 
-  ${emp === "MERCATTO RESTAURANTE" ? `
-    <div id="travasBox"></div>
-  ` : ""}
+<div id="travasBoxGlobal" style="
+  position:fixed;
+  bottom:10px;
+  right:10px;
+  background:#020617;
+  border:1px solid #1e293b;
+  padding:10px;
+  border-radius:10px;
+  font-size:12px;
+  z-index:999;
+"></div>
 
 `
   }
@@ -1820,7 +1828,7 @@ function calcularTravasIsolado(financeiro, faturamento){
 }
 function atualizarTravasCard(){
 
-  const el = document.getElementById("travasBox")
+const el = document.getElementById("travasBoxGlobal")
   if(!el) return
 
   const t = window.travasFinanceiro || {}
