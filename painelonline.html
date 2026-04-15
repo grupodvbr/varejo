@@ -793,18 +793,26 @@ function render(dados, dadosMes){
 return `
   <div class="card-top">
 
-    <div style="display:flex;align-items:center;gap:8px">
 
-      <img src="${getLogo(emp)}" class="logo">
+<div style="display:flex;align-items:center;gap:8px">
 
-      <div style="display:flex;flex-direction:column;gap:2px">
-        <div class="valor">${brl(d.total)}</div>
-        <div style="font-size:11px;color:#94a3b8">
-          Ticket: ${brl(ticketMedio)}
-        </div>
-      </div>
+  <img src="${getLogo(emp)}" class="logo">
 
+  <div style="display:flex;flex-direction:column;gap:2px">
+
+    <div class="valor">${brl(d.total)}</div>
+
+    <div style="font-size:11px;color:#94a3b8">
+      ${d.vendas} vendas
     </div>
+
+    <div style="font-size:11px;color:#94a3b8">
+      Ticket: ${brl(ticketMedio)}
+    </div>
+
+  </div>
+
+</div>
 
     <div class="metas">
       ${(() => {
