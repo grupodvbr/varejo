@@ -1240,12 +1240,22 @@ if(cache){
 }
 
 // 🔄 SEMPRE CARREGA DO BANCO DEPOIS
-;(async () => {
+window.addEventListener("DOMContentLoaded", async () => {
+
+  const t = turno()
+  const hoje = formatDateOnly(t.inicio)
+
+  document.getElementById("data").value = hoje
+
+  console.log("📅 Data automática:", hoje)
 
   await iniciarAutoImport()
-  await load(document.getElementById("data").value)
+  await load(hoje)
 
-})()
+})
+
+
+  
 let carregando = false
 
 // ================= AUTO IMPORTAÇÃO =================
