@@ -628,18 +628,84 @@ function getMetaEmpresa(nome){
 
   
 // ================= RENDER =================
+
 function render(dados, dadosMes){
 
-  window.dadosCache = dados // 🔥 OBRIGATÓRIO
+  window.dadosCache = dados
 
-  renderKPIs(dados)
+  function montarCard(emp){
 
-const left = document.getElementById("left")
-const right = document.getElementById("right")
+    const d = dados[emp] || {
+      total:0, vendas:0, cancelados:0, valorCancelado:0,
+      almocoTotal:0, almocoVendas:0
+    }
 
-// 🔥 LIMPA ANTES DE RENDERIZAR
-left.innerHTML = ""
-right.innerHTML = ""
+    const dMes = dadosMes[emp] || { total:0 }
+
+    return `
+      <div class="card-top">
+
+        <div style="display:flex;align-items:center;gap:8px">
+          <img src="${getLogo(emp)}" class="logo">
+          <div class="valor">${brl(d.total)}</div>
+        </div>
+
+        <div class="metas">
+          ${(() => {
+            const meta = getMetaEmpresa(emp)
+            if(!meta) return ""
+
+            const pct1 = Math.min((dMes.total/meta.prata)*100,100)
+            const pct2 = Math.min((dMes.total/meta.ouro)*100,100)
+
+            return `
+              <div class="bola prata" style="--p:${pct1}%">${pct1.toFixed(0)}%</div>
+              <div class="bola ouro" style="--p:${pct2}%">${pct2.toFixed(0)}%</div>
+            `
+          })()}
+        </div>
+
+      </div>
+
+      <div class="vendas">${d.vendas} vendas</div>
+
+      <div class="almoco">
+        🍽️ ${brl(d.almocoTotal)} (${d.almocoVendas})
+      </div>
+
+      <div class="mes">
+        <span>📊 Mês</span>
+        <span>${brl(dMes.total)}</span>
+      </div>
+
+      <div class="cancel">
+        ❌ ${d.cancelados} (${brl(d.valorCancelado)})
+      </div>
+    `
+  }
+
+  // 🔥 FIXO NOS ELEMENTOS
+  document.getElementById("villa").innerHTML = montarCard("VILLA")
+  document.getElementById("delicia").innerHTML = montarCard("DELICIA")
+  document.getElementById("padaria").innerHTML = montarCard("PADARIA")
+  document.getElementById("restaurante").innerHTML = montarCard("MERCATTO RESTAURANTE")
+  document.getElementById("emporio").innerHTML = montarCard("MERCATTO EMPÓRIO")
+
+  // 🔥 TOTAL MERCATTO (EMPORIO + RESTAURANTE + MKIDS)
+  const totalMercatto =
+    (dadosMes["MERCATTO EMPÓRIO"]?.total || 0) +
+    (dadosMes["MERCATTO RESTAURANTE"]?.total || 0) +
+    (dadosMes["MKIDS"]?.total || 0)
+
+  document.getElementById("totalMercatto").innerHTML = `
+    <div class="titulo">TOTAL MERCATTO</div>
+    <div class="valor">${brl(totalMercatto)}</div>
+  `
+}
+
+
+
+  
   const ORDEM = [
     "VILLA",
     "DELICIA",
