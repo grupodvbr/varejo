@@ -945,6 +945,10 @@ return `
 
   </div>
 
+  ${emp === "MERCATTO RESTAURANTE" ? `
+    <div id="travasBox"></div>
+  ` : ""}
+
 `
   }
 
@@ -1115,6 +1119,13 @@ render(parcial, window.dadosMesCache || {})
   }
 
   from += step
+
+
+
+
+
+
+  
 }
 // 🔥 FINAL
 console.log("📊 TOTAL CARREGADO:", dadosParciais.length)
@@ -1289,7 +1300,22 @@ if(!carregandoMes){
 dot.classList.remove("loading")
 dot.style.background = "#22c55e"
 dot.style.boxShadow = "0 0 10px #22c55e"
+// ================= FINANCEIRO ISOLADO =================
+setTimeout(async () => {
 
+  const financeiro = await carregarFinanceiroIsolado()
+
+  const faturamento =
+    window.dadosMesCache?.["MERCATTO RESTAURANTE"]?.total || 0
+
+  window.travasFinanceiro = calcularTravasIsolado(
+    financeiro,
+    faturamento
+  )
+
+  atualizarTravasCard()
+
+}, 500)
 console.log("✅ FINALIZADO LOAD")
 document.getElementById("periodo").innerText =
   `Data: ${dataSelecionada}`
@@ -1715,8 +1741,104 @@ if(popupEl){
 }
   
 
+// ================= FINANCEIRO (ISOLADO) =================
 
+const PLANOS_FORNECEDORES = [
+  "Fornecedores em geral (insumos)",
+  "Bebidas (adegas)",
+  "Cerveja/Long",
+  "Refrigerantes/água/suco",
+  "Frios/congelados",
+  "Doces e chocolates",
+  "Laticínios",
+  "Gelatto",
+  "Hortaliças (Padaria)",
+  "Hortifruti",
+  "Processados/assados (Panificação)",
+  "Salmão",
+  "Pescados (peixaria)",
+  "Chopp Brahma",
+  "Açougues",
+  "Aves",
+  "Mercados Locais LEM",
+  "Mercado (Materiais Não Consumo)"
+]
 
+async function carregarFinanceiroIsolado(){
+
+  const { data, error } = await sb
+    .from("f360_parcelas")
+    .select("empresa,valor,vencimento,raw")
+
+  if(error){
+    console.log("❌ ERRO FINANCEIRO:", error)
+    return []
+  }
+
+  return data || []
+}
+
+function calcularTravasIsolado(financeiro, faturamento){
+
+  let fornecedores = 0
+  let geral = 0
+
+  const hoje = new Date()
+  const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1)
+  const fimMes = new Date(hoje.getFullYear(), hoje.getMonth()+1, 0)
+
+  financeiro.forEach(f => {
+
+    const venc = new Date(f.vencimento)
+    if(venc < inicioMes || venc > fimMes) return
+
+    const raw = f.raw || {}
+
+    raw?.Rateio?.forEach(r => {
+
+      const nome = r.PlanoDeContas || ""
+      const valor = Number(r.Valor || 0)
+
+      if(PLANOS_FORNECEDORES.includes(nome)){
+        fornecedores += valor
+      }else{
+        geral += valor
+      }
+
+    })
+
+  })
+
+  return {
+    fornecedores,
+    geral,
+    pctF: faturamento ? (fornecedores / faturamento * 100) : 0,
+    pctG: faturamento ? (geral / faturamento * 100) : 0
+  }
+}
+function atualizarTravasCard(){
+
+  const el = document.getElementById("travasBox")
+  if(!el) return
+
+  const t = window.travasFinanceiro || {}
+
+  el.innerHTML = `
+    <div style="margin-top:6px;border-top:1px solid #1e293b;padding-top:6px;font-size:10px">
+
+      <div style="display:flex;justify-content:space-between">
+        <span style="color:#22c55e">Fornec.</span>
+        <span>${brl(t.fornecedores || 0)} (${(t.pctF||0).toFixed(1)}%)</span>
+      </div>
+
+      <div style="display:flex;justify-content:space-between">
+        <span style="color:#60a5fa">Geral</span>
+        <span>${brl(t.geral || 0)} (${(t.pctG||0).toFixed(1)}%)</span>
+      </div>
+
+    </div>
+  `
+}
 
 
   
