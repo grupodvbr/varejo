@@ -1276,7 +1276,7 @@ async function rodarImportacaoAutomatica(){
       document.getElementById("status").innerText =
         "Importando: " + empresa
 
-      await fetch(API_URL + "/api/importar",{
+      await fetch(API_URL + "/api/importar-cupons",{
         method:"POST",
         headers:{
           "Content-Type":"application/json"
