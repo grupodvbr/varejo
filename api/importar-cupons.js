@@ -139,13 +139,27 @@ if(items.length === 0){
 }
 
 // 🔍 Detecta repetição de página (API bug comum)
-const paginaHash = JSON.stringify(items.map(i => i.id))
+let totalSemNovos = 0
 
-if(paginaHash === ultimaPaginaHash){
-  log("⚠️ Página repetida - pulando...")
+const novos = items.filter(c => {
+  const id = empresa + "_" + c.id
+  return !ids.has(id)
+})
+
+if(novos.length === 0){
+  totalSemNovos++
+  log(`⚠️ Página sem novos (${totalSemNovos})`)
+
+  if(totalSemNovos >= 3){
+    log("🏁 Fim real detectado")
+    break
+  }
+
   pagina++
   continue
 }
+
+totalSemNovos = 0
 
 ultimaPaginaHash = paginaHash
 
@@ -156,9 +170,6 @@ ultimaPaginaHash = paginaHash
 
         const unique_id = empresa + "_" + cupom.id
 
- if(ids.has(unique_id)){
-  continue
-}
 
         ids.add(unique_id)
 
