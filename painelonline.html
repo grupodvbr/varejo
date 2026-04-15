@@ -183,6 +183,12 @@ header div:first-child{
   height:38px;
   background:#020617;
   border-radius:50%;
+  z-index:1; /* 🔥 fica atrás */
+}
+
+.bola span{
+  position:relative;
+  z-index:2; /* 🔥 fica na frente */
 }
 
 /* PRATA */
@@ -281,6 +287,18 @@ header div:first-child{
   html,body{
     overflow:auto;
   }
+}
+
+
+
+  .bola{
+  width:60px;
+  height:60px;
+  font-size:12px;
+}
+
+.bola span{
+  font-weight:800;
 }
 </style>
 </head>
@@ -659,9 +677,13 @@ function render(dados, dadosMes){
             const pct2 = Math.min((dMes.total/meta.ouro)*100,100)
 
             return `
-              <div class="bola prata" style="--p:${pct1}%">${pct1.toFixed(0)}%</div>
-              <div class="bola ouro" style="--p:${pct2}%">${pct2.toFixed(0)}%</div>
-            `
+<div class="bola prata" style="--p:${pct1}%">
+  <span>${pct1.toFixed(0)}%</span>
+</div>
+
+<div class="bola ouro" style="--p:${pct2}%">
+  <span>${pct2.toFixed(0)}%</span>
+</div>`
           })()}
         </div>
 
