@@ -196,27 +196,36 @@ inserts.push({
 
 
 
-      
-      // ================= INSERT CUPONS =================
-      if(inserts.length > 0){
+   
 
-        const tInsert = Date.now()
+// ================= INSERT CUPONS =================
+if(inserts.length > 0){
 
-        const { error } = await supabase
-          .from("cupons_importados")
-          .upsert(inserts, { onConflict:"unique_id" })
+  const tInsert = Date.now()
 
-        if(error){
-          log("❌ ERRO INSERT CUPONS: " + error.message)
-        }else{
-          totalCupons += inserts.length
-        }
+  const chunkSize = 100
 
-        const tempoInsert = ((Date.now() - tInsert)/1000).toFixed(2)
+  for(let i = 0; i < inserts.length; i += chunkSize){
 
-        log(`💾 Inseridos: ${inserts.length} | Tempo DB: ${tempoInsert}s`)
-      }
+    const chunk = inserts.slice(i, i + chunkSize)
 
+    const { error } = await supabase
+      .from("cupons_importados")
+      .upsert(chunk, { onConflict:"unique_id" })
+
+    if(error){
+      log("❌ ERRO INSERT LOTE: " + error.message)
+    }else{
+      totalCupons += chunk.length
+    }
+  }
+
+  const tempoInsert = ((Date.now() - tInsert)/1000).toFixed(2)
+
+  log(`💾 Inseridos: ${inserts.length} | Tempo DB: ${tempoInsert}s`)
+}
+
+     
       // ================= INSERT PAGAMENTOS =================
       if(pagamentos.length > 0){
 
