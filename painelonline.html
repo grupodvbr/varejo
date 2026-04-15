@@ -815,24 +815,9 @@ return `
     </div>
 
     <!-- INFO -->
-<div style="display:flex;flex-direction:column;gap:2px">
-
-  <!-- VALOR -->
-  <div class="valor">
-    ${brl(d.total)}
-  </div>
-
-  <!-- VENDAS -->
-  <div class="vendas">
-    ${d.vendas} vendas
-  </div>
-
-  <!-- TICKET -->
-  <div class="ticket">
-    Ticket: ${brl(ticketMedio)}
-  </div>
-
-</div>
+    <div style="font-size:11px;color:#94a3b8">
+      ${d.vendas} vendas • Ticket: ${brl(ticketMedio)}
+    </div>
 
   </div>
 
