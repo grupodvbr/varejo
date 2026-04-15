@@ -697,43 +697,8 @@ function parse(v){
   }
 }
 
-
-
-
-
-
-function normalizarFinanceiroEmpresa(nome){
-
-  const n = (nome || "").toUpperCase()
-
-  if(n.includes("VILLA")) return "VILLA"
-
-  if(n.includes("DELICIA") || n.includes("DELÍCIA"))
-    return "DELICIA"
-
-  if(n.includes("PADARIA"))
-    return "PADARIA"
-
-if(n.includes("MERCATTO")){
-  return "MERCATTO RESTAURANTE"
-}
-
-  if(n.includes("KIDS") || n.includes("MKIDS"))
-    return "MKIDS"
-
-  // 🔥 DEBUG (IMPORTANTE)
-  console.log("❌ EMPRESA F360 NÃO MAPEADA:", nome)
-
-  return null
-}
-
-
-
-
-
-  
 // ================= PROCESS =================
-function process(data, inicio, fim, financeiro=[]){
+function process(data, inicio, fim){
 
   const result = {}
 
@@ -848,133 +813,6 @@ if(isAlmoco){
 }
   })
 
-
-// 🔥🔥🔥 COLE EXATAMENTE AQUI 🔥🔥🔥
-const EMPRESAS_BASE = [
-  "VILLA",
-  "DELICIA",
-  "PADARIA",
-  "MERCATTO EMPÓRIO",
-  "MERCATTO RESTAURANTE",
-  "MKIDS"
-]
-
-EMPRESAS_BASE.forEach(emp=>{
-  if(!result[emp]){
-    result[emp] = {
-      total:0,
-      vendas:0,
-      cancelados:0,
-      valorCancelado:0,
-      finais:{},
-      almocoTotal:0,
-      almocoVendas:0
-    }
-  }
-})
-
-
-// ================= FINANCEIRO =================
-
-const hoje = new Date().toISOString().slice(0,10)
-const mesAtual = new Date().getMonth()
-const anoAtual = new Date().getFullYear()
-
-financeiro.forEach(f => {
-
-const empRaw =
-  f.empresa ||
-  f.empresa_nome ||
-  f.nome_empresa ||
-  f.descricao_empresa ||
-  f.fantasia ||
-  f.razao_social ||
-  ""
-
-const emp = normalizarFinanceiroEmpresa(empRaw)
-
-if(!emp){
-  console.log("❌ F360 SEM EMPRESA:", f)
-  return
-}
-
-// 🔥 GARANTE EXISTÊNCIA
-if(!result[emp]){
-  result[emp] = {
-    total:0,
-    vendas:0,
-    cancelados:0,
-    valorCancelado:0,
-    finais:{},
-    almocoTotal:0,
-    almocoVendas:0
-  }
-}
-  const d = result[emp]
-
-  const valor = Number(f.valor || 0)
-  const status = (f.status || "").toUpperCase()
-  const dataVenc = f.vencimento
-
-  if(!dataVenc) return
-
-  const dataObj = new Date(dataVenc)
-  const dataStr = dataObj.toISOString().slice(0,10)
-
-  // ================= HOJE =================
-  if(dataStr === hoje){
-
-    d.finHojeTotal = (d.finHojeTotal || 0) + valor
-
-    if(status.includes("ABERTO")){
-      d.finHojeAberto = (d.finHojeAberto || 0) + valor
-    }
-
-    if(status.includes("PAGO") || status.includes("LIQUIDADO")){
-      d.finHojePago = (d.finHojePago || 0) + valor
-    }
-  }
-
-  // ================= MÊS =================
-  if(
-    dataObj.getMonth() === mesAtual &&
-    dataObj.getFullYear() === anoAtual
-  ){
-
-    if(status.includes("ABERTO")){
-      d.finMesAberto = (d.finMesAberto || 0) + valor
-    }
-
-    if(status.includes("PAGO") || status.includes("LIQUIDADO")){
-      d.finMesPago = (d.finMesPago || 0) + valor
-    }
-  }
-
-  // ================= TRAVA =================
-  const plano = (f.plano_conta || "").toUpperCase()
-
-  const isFornecedor =
-    plano.includes("FORNECEDOR") ||
-    plano.includes("INSUMO") ||
-    plano.includes("BEBIDA") ||
-    plano.includes("HORTI") ||
-    plano.includes("AÇOUGUE") ||
-    plano.includes("FRIOS") ||
-    plano.includes("PEIX") ||
-    plano.includes("SALM")
-
-  if(isFornecedor){
-    d.travaFornecedor = (d.travaFornecedor || 0) + valor
-  }else{
-    d.travaGeral = (d.travaGeral || 0) + valor
-  }
-
-})
-
-
-
-
-  
   return result
 }
 
@@ -1055,7 +893,6 @@ return `
   <div class="vendas-linha">
     ${d.vendas} vendas 
     <span class="cancel-inline">
-      ❌ ${d.cancelados}
     </span>
   </div>
 
@@ -1105,67 +942,6 @@ return `
     `
   })()}
 </div>
-
-
-
-
-
-<div style="margin-top:6px;padding:6px;border-top:1px solid #1e293b">
-
-  <!-- HOJE -->
-  <div style="font-size:10px;color:#94a3b8">Hoje</div>
-
-  <div style="display:flex;justify-content:space-between;font-size:11px">
-    <span>A pagar</span>
-    <b>${brl(d.finHojeTotal || 0)}</b>
-  </div>
-
-  <div style="display:flex;justify-content:space-between;font-size:11px">
-    <span style="color:#22c55e">Pago</span>
-    <b>${brl(d.finHojePago || 0)}</b>
-  </div>
-
-  <div style="display:flex;justify-content:space-between;font-size:11px">
-    <span style="color:#ef4444">Aberto</span>
-    <b>${brl(d.finHojeAberto || 0)}</b>
-  </div>
-
-  <!-- MÊS -->
-  <div style="font-size:10px;color:#94a3b8;margin-top:6px">Mês</div>
-
-  <div style="display:flex;justify-content:space-between;font-size:11px">
-    <span style="color:#22c55e">Pago</span>
-    <b>${brl(d.finMesPago || 0)}</b>
-  </div>
-
-  <div style="display:flex;justify-content:space-between;font-size:11px">
-    <span style="color:#ef4444">Aberto</span>
-    <b>${brl(d.finMesAberto || 0)}</b>
-  </div>
-
-  <!-- TRAVAS -->
-  <div style="font-size:10px;color:#94a3b8;margin-top:6px">Travas</div>
-
-  <div style="display:flex;justify-content:space-between;font-size:11px">
-    <span style="color:#ef4444">Fornec.</span>
-    <b>${brl(d.travaFornecedor || 0)}</b>
-  </div>
-
-  <div style="display:flex;justify-content:space-between;font-size:11px">
-    <span style="color:#3b82f6">Geral</span>
-    <b>${brl(d.travaGeral || 0)}</b>
-  </div>
-
-</div>
-
-
-
-
-
-
-
-
-
 
   </div>
 
@@ -1254,40 +1030,6 @@ function salvarCache(dados, dadosMes){
   }
 
 }
-
-
-
-async function carregarFinanceiro(){
-
-  const hoje = new Date().toISOString().slice(0,10)
-
-  const inicioMes = hoje.slice(0,7) + "-01"
-
-  const { data, error } = await sb
-    .from("f360_parcelas")
-    .select("*")
-    .gte("vencimento", inicioMes)
-    .lte("vencimento", hoje)
-
-  if(error){
-    console.log("❌ ERRO FINANCEIRO:", error)
-    return []
-  }
-
-  console.log("💰 FINANCEIRO CARREGADO:", data?.length)
-
-  return data || []
-}
-
-
-
-
-
-
-
-
-
-  
 // ================= LOAD =================
 async function load(dataSelecionada){
 
@@ -1531,18 +1273,8 @@ salvarCache(
 const inicio = new Date(dataSelecionada + "T00:00:00")
 const fim = new Date(dataSelecionada + "T23:59:59")
 
-const financeiro = await carregarFinanceiro()
-
-const finalDados = process(
-  dadosParciais,
-  inicio,
-  fim,
-  financeiro
-)
-  
-  
-  
-  console.log("📊 FINAL FILTRADO:", finalDados)
+const finalDados = process(dadosParciais, inicio, fim)
+console.log("📊 FINAL FILTRADO:", finalDados)
 
 // ✅ AQUI (EXATO)
 if(!window.renderInicializado){
@@ -1559,10 +1291,9 @@ dot.style.background = "#22c55e"
 dot.style.boxShadow = "0 0 10px #22c55e"
 
 console.log("✅ FINALIZADO LOAD")
-const periodoEl = document.getElementById("periodo")
-if(periodoEl){
-  periodoEl.innerText = `Data: ${dataSelecionada}`
-}
+document.getElementById("periodo").innerText =
+  `Data: ${dataSelecionada}`
+
 }
 // ================= RELOAD =================
 async function reload(){
@@ -1756,7 +1487,7 @@ function lerJSONSeguro(raw){
 function normalizarEmpresa(empBase, caixa){
 
   const nome = (empBase || "").trim().toUpperCase()
-  if(nome.includes("MKIDS")) return "MKIDS"
+
   if(nome.includes("DELICIA")) return "DELICIA"
   if(nome.includes("VILLA")) return "VILLA"
   if(nome.includes("PADARIA")) return "PADARIA"
