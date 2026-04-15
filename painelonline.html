@@ -661,33 +661,41 @@ function render(dados, dadosMes){
   window.dadosCache = dados
 
   function montarCard(emp){
-const ticketMedio = d.vendas > 0 ? d.total / d.vendas : 0
-const ticketAlmoco = d.almocoVendas > 0 ? d.almocoTotal / d.almocoVendas : 0
+
     const d = dados[emp] || {
-      total:0, vendas:0, cancelados:0, valorCancelado:0,
-      almocoTotal:0, almocoVendas:0
+      total:0,
+      vendas:0,
+      cancelados:0,
+      valorCancelado:0,
+      almocoTotal:0,
+      almocoVendas:0
     }
 
     const dMes = dadosMes[emp] || { total:0 }
+
+    // ✅ CALCULA FORA DO HTML
+    const ticketMedio = d.vendas > 0 ? d.total / d.vendas : 0
+    const ticketAlmoco = d.almocoVendas > 0 ? d.almocoTotal / d.almocoVendas : 0
 
     return `
       <div class="card-top">
 
         <div style="display:flex;align-items:center;gap:8px">
-          <img src="${getLogo(emp)}" class="logo">
-          const ticketMedio = d.vendas > 0 ? d.total / d.vendas : 0
 
-<div style="display:flex;flex-direction:column;gap:2px">
-<div>
-  <div class="valor">${brl(d.total)}</div>
-  <div style="font-size:11px;color:#94a3b8">
-    Ticket: ${brl(ticketMedio)}
-  </div>
-</div>
+          <img src="${getLogo(emp)}" class="logo">
+
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <div class="valor">${brl(d.total)}</div>
+            <div style="font-size:11px;color:#94a3b8">
+              Ticket: ${brl(ticketMedio)}
+            </div>
+          </div>
+
         </div>
 
         <div class="metas">
           ${(() => {
+
             const meta = getMetaEmpresa(emp)
             if(!meta) return ""
 
@@ -695,13 +703,14 @@ const ticketAlmoco = d.almocoVendas > 0 ? d.almocoTotal / d.almocoVendas : 0
             const pct2 = Math.min((dMes.total/meta.ouro)*100,100)
 
             return `
-<div class="bola prata" style="--p:${pct1}%">
-  <span>${pct1.toFixed(0)}%</span>
-</div>
+              <div class="bola prata" style="--p:${pct1}%">
+                <span>${pct1.toFixed(0)}%</span>
+              </div>
 
-<div class="bola ouro" style="--p:${pct2}%">
-  <span>${pct2.toFixed(0)}%</span>
-</div>`
+              <div class="bola ouro" style="--p:${pct2}%">
+                <span>${pct2.toFixed(0)}%</span>
+              </div>
+            `
           })()}
         </div>
 
@@ -709,13 +718,11 @@ const ticketAlmoco = d.almocoVendas > 0 ? d.almocoTotal / d.almocoVendas : 0
 
       <div class="vendas">${d.vendas} vendas</div>
 
-      const ticketAlmoco = d.almocoVendas > 0 ? d.almocoTotal / d.almocoVendas : 0
-
-<div class="almoco">
-  🍽️ ${brl(d.almocoTotal)} (${d.almocoVendas})
-  <br>
-  Ticket: ${brl(ticketAlmoco)}
-</div>
+      <div class="almoco">
+        🍽️ ${brl(d.almocoTotal)} (${d.almocoVendas})
+        <br>
+        Ticket: ${brl(ticketAlmoco)}
+      </div>
 
       <div class="mes">
         <span>📊 Mês</span>
@@ -728,14 +735,14 @@ const ticketAlmoco = d.almocoVendas > 0 ? d.almocoTotal / d.almocoVendas : 0
     `
   }
 
-  // 🔥 FIXO NOS ELEMENTOS
+  // 🔥 FIXO NOS CARDS
   document.getElementById("villa").innerHTML = montarCard("VILLA")
   document.getElementById("delicia").innerHTML = montarCard("DELICIA")
   document.getElementById("padaria").innerHTML = montarCard("PADARIA")
   document.getElementById("restaurante").innerHTML = montarCard("MERCATTO RESTAURANTE")
   document.getElementById("emporio").innerHTML = montarCard("MERCATTO EMPÓRIO")
 
-  // 🔥 TOTAL MERCATTO (EMPORIO + RESTAURANTE + MKIDS)
+  // 🔥 TOTAL MERCATTO
   const totalMercatto =
     (dadosMes["MERCATTO EMPÓRIO"]?.total || 0) +
     (dadosMes["MERCATTO RESTAURANTE"]?.total || 0) +
