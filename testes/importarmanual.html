@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>IMPORTAÇÃO PROFISSIONAL</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+  --bg:#f1f5f9;
+  --card:#ffffff;
+  --border:#e2e8f0;
+  --text:#0f172a;
+  --sub:#64748b;
+  --green:#16a34a;
+  --blue:#2563eb;
+  --yellow:#f59e0b;
+  --red:#ef4444;
+}
+
+/* BASE */
+body{
+  margin:0;
+  font-family:Inter;
+  background:var(--bg);
+  color:var(--text);
+}
+
+/* HEADER */
+header{
+  padding:15px;
+  background:#ffffff;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  gap:10px;
+  align-items:center;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+input{
+  padding:10px;
+  border-radius:6px;
+  border:1px solid var(--border);
+  font-size:14px;
+  background:#fff;
+}
+
+button{
+  padding:10px 14px;
+  border-radius:6px;
+  border:none;
+  background:var(--green);
+  color:white;
+  font-weight:700;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#22c55e;
+}
+
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  grid-template-rows:1fr 1fr;
+  height:calc(100vh - 70px);
+  gap:12px;
+  padding:12px;
+}
+
+/* CARD */
+.card{
+  background:var(--card);
+  border-radius:12px;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  box-shadow:0 4px 20px rgba(0,0,0,0.05);
+  border:1px solid var(--border);
+}
+
+/* HEADER CARD */
+.card-header{
+  padding:14px;
+  font-weight:700;
+  font-size:16px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+}
+
+/* STATUS */
+.status{
+  font-size:13px;
+  color:var(--sub);
+}
+
+/* KPI */
+.kpi{
+  display:flex;
+  justify-content:space-between;
+  padding:10px 14px;
+  font-size:13px;
+  border-bottom:1px solid var(--border);
+}
+
+.kpi div{
+  display:flex;
+  flex-direction:column;
+}
+
+.kpi span{
+  font-weight:800;
+  font-size:18px;
+  color:var(--green);
+}
+
+/* PROGRESS */
+.progress{
+  height:6px;
+  background:#e2e8f0;
+}
+
+.bar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#16a34a,#22c55e);
+  transition:0.3s;
+}
+
+/* LOG */
+.log{
+  flex:1;
+  overflow:auto;
+  padding:12px;
+  font-family:monospace;
+  font-size:13px;
+  background:#f8fafc;
+  line-height:1.5;
+}
+
+/* LINHAS */
+.line{ margin-bottom:4px; }
+
+.info{ color:var(--blue) }
+.success{ color:var(--green) }
+.warn{ color:var(--yellow) }
+.error{ color:var(--red) }
+.highlight{ color:#ca8a04; font-weight:700 }
+.sep{ color:var(--sub) }
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<label>Data início:</label>
+<input type="date" id="dataInicio">
+
+<label>Data fim:</label>
+<input type="date" id="dataFim">
+
+<button onclick="executarTudo()">🚀 Executar Tudo</button>
+
+</header>
+
+<div class="grid">
+
+<!-- CARDS (mantidos iguais) -->
+<div class="card">
+  <div class="card-header">
+    MERCATTO
+    <span class="status" id="status_MERCATTO">Aguardando</span>
+  </div>
+
+  <div class="kpi">
+    <div>💰 Total<span id="total_MERCATTO">R$ 0,00</span></div>
+    <div>📅 Dia<span id="dia_MERCATTO">-</span></div>
+  </div>
+
+  <div class="progress"><div class="bar" id="bar_MERCATTO"></div></div>
+  <div class="log" id="log_MERCATTO"></div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    VILLA
+    <span class="status" id="status_VILLA">Aguardando</span>
+  </div>
+
+  <div class="kpi">
+    <div>💰 Total<span id="total_VILLA">R$ 0,00</span></div>
+    <div>📅 Dia<span id="dia_VILLA">-</span></div>
+  </div>
+
+  <div class="progress"><div class="bar" id="bar_VILLA"></div></div>
+  <div class="log" id="log_VILLA"></div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    PADARIA
+    <span class="status" id="status_PADARIA">Aguardando</span>
+  </div>
+
+  <div class="kpi">
+    <div>💰 Total<span id="total_PADARIA">R$ 0,00</span></div>
+    <div>📅 Dia<span id="dia_PADARIA">-</span></div>
+  </div>
+
+  <div class="progress"><div class="bar" id="bar_PADARIA"></div></div>
+  <div class="log" id="log_PADARIA"></div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    DELÍCIA
+    <span class="status" id="status_DELICIA">Aguardando</span>
+  </div>
+
+  <div class="kpi">
+    <div>💰 Total<span id="total_DELICIA">R$ 0,00</span></div>
+    <div>📅 Dia<span id="dia_DELICIA">-</span></div>
+  </div>
+
+  <div class="progress"><div class="bar" id="bar_DELICIA"></div></div>
+  <div class="log" id="log_DELICIA"></div>
+</div>
+
+</div>
+
+<script>
+
+const empresas = [
+  {nome:"MERCATTO", value:"VAREJO_URL_MERCATTO"},
+  {nome:"VILLA", value:"VAREJO_URL_VILLA"},
+  {nome:"PADARIA", value:"VAREJO_URL_PADARIA"},
+  {nome:"DELICIA", value:"VAREJO_URL_DELICIA"}
+]
+
+// LOG
+function addLog(nome, text){
+
+  const logDiv = document.getElementById("log_"+nome)
+
+  const el = document.createElement("div")
+  el.classList.add("line")
+
+  if(text.includes("❌")) el.classList.add("error")
+  else if(text.includes("⚠️")) el.classList.add("warn")
+  else if(text.includes("✅")) el.classList.add("success")
+  else if(text.includes("📊")) el.classList.add("highlight")
+  else if(text.includes("━━")) el.classList.add("sep")
+  else el.classList.add("info")
+
+  el.textContent = text
+
+  logDiv.appendChild(el)
+  logDiv.scrollTop = logDiv.scrollHeight
+
+  atualizarKPI(nome, text)
+}
+
+// KPI
+function atualizarKPI(nome, linha){
+
+  if(linha.includes("🧾 Cupom")){
+    const valor = linha.match(/R\$ ([\d\.]+)/)
+    if(valor){
+
+      let atual = Number(
+        document.getElementById("total_"+nome).innerText
+        .replace("R$","")
+        .replace(/\./g,"")
+        .replace(",",".")
+      ) || 0
+
+      atual += Number(valor[1])
+
+      const el = document.getElementById("total_"+nome)
+
+      el.innerText = atual.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})
+
+      // 🔥 ANIMAÇÃO
+      el.style.transform = "scale(1.1)"
+      setTimeout(()=> el.style.transform="scale(1)",150)
+    }
+  }
+
+  if(linha.includes("Período")){
+    const d = linha.split("→")[0].split(":")[1]
+    if(d){
+      document.getElementById("dia_"+nome).innerText = d.trim()
+    }
+  }
+}
+
+// EXECUÇÃO
+async function executarEmpresa(emp){
+
+  const nome = emp.nome
+  const status = document.getElementById("status_"+nome)
+  const bar = document.getElementById("bar_"+nome)
+
+  document.getElementById("log_"+nome).innerHTML = ""
+  document.getElementById("total_"+nome).innerText = "R$ 0,00"
+  document.getElementById("dia_"+nome).innerText = "-"
+
+  bar.style.width = "0%"
+  status.innerText = "Executando..."
+
+  const response = await fetch("/api/importar-cupons",{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({
+      empresa: emp.value,
+      dataInicio: document.getElementById("dataInicio").value,
+      dataFim: document.getElementById("dataFim").value
+    })
+  })
+
+  const reader = response.body.getReader()
+  const decoder = new TextDecoder()
+
+  let buffer = ""
+  let progresso = 0
+
+  while(true){
+    const { done, value } = await reader.read()
+    if(done) break
+
+    buffer += decoder.decode(value)
+
+    const linhas = buffer.split("\n")
+    buffer = linhas.pop()
+
+    linhas.forEach(linha=>{
+      if(linha.trim()){
+        addLog(nome,linha)
+
+        progresso += 2
+        if(progresso > 100) progresso = 100
+        bar.style.width = progresso + "%"
+      }
+    })
+  }
+
+  bar.style.width = "100%"
+  status.innerText = "Finalizado"
+}
+
+async function executarTudo(){
+  await Promise.all(empresas.map(e => executarEmpresa(e)))
+}
+
+</script>
+
+</body>
+</html>
