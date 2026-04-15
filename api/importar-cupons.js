@@ -99,8 +99,7 @@ let ultimaPaginaHash = null
     // ================= LOOP =================
     while(true){
 
-      const url = `${baseURL}?pagina=${pagina}&count=${count}&q=data=ge=${inicio};data=le=${fim}`
-
+const url = `${baseURL}?pagina=${pagina}&count=${count}&q=datahora>=${inicio}T00:00:00;datahora<=${fim}T23:59:59`
       const t0 = Date.now()
 
       let response
