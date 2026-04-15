@@ -1701,8 +1701,11 @@ if(statusEl){
     await new Promise(r => setTimeout(r, 1500))
   }
 
-  document.getElementById("status").innerText =
+const statusEl = document.getElementById("status")
+if(statusEl){
+  statusEl.innerText =
     "Atualizado: " + new Date().toLocaleTimeString()
+}
 
   dot.classList.remove("loading")
 
