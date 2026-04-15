@@ -416,7 +416,12 @@ header div:first-child{
 
   gap:8px;
 }
-    
+.valor-mes{
+  font-size:clamp(14px, 2.2vw, 22px);
+  font-weight:900;
+  color:#22c55e;
+  letter-spacing:0.5px;
+}
 </style>
 </head>
 
@@ -797,19 +802,23 @@ return `
 
   <img src="${getLogo(emp)}" class="logo">
 
-  <div style="display:flex;flex-direction:column;gap:2px">
+<div style="display:flex;flex-direction:column;gap:2px">
 
-    <div class="valor">${brl(d.total)}</div>
-
-    <div style="font-size:11px;color:#94a3b8">
-      ${d.vendas} vendas
-    </div>
-
-    <div style="font-size:11px;color:#94a3b8">
-      Ticket: ${brl(ticketMedio)}
-    </div>
-
+  <!-- 🔥 VALOR DO MÊS (DESTAQUE) -->
+  <div class="valor-mes">
+    ${brl(dMes.total)}
   </div>
+
+  <!-- 🔽 VALOR DO DIA -->
+  <div class="valor">
+    ${brl(d.total)}
+  </div>
+
+  <div style="font-size:11px;color:#94a3b8">
+    ${d.vendas} vendas • Ticket: ${brl(ticketMedio)}
+  </div>
+
+</div>
 
 </div>
 
@@ -857,10 +866,6 @@ return `
   <span>Ticket: ${brl(ticketAlmoco)}</span>
 </div>
 
-  <div class="mes">
-    <span>📊 Mês</span>
-    <span>${brl(dMes.total)}</span>
-  </div>
 
   <div class="cancel">
     ❌ ${d.cancelados} (${brl(d.valorCancelado)})
