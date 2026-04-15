@@ -184,40 +184,53 @@ header div:first-child{
   gap:2px;
 }
 
+/* ================= METAS ================= */
+.metas{
+  display:flex;
+  gap:6px;
+}
+
+/* BOLINHA */
 .bola{
-  width:clamp(28px, 2vw, 34px);
-  height:clamp(28px, 2vw, 34px);
-  font-size:clamp(8px, 0.9vw, 10px);
+  width:36px;
+  height:36px;
   border-radius:50%;
   position:relative;
+
   display:flex;
   align-items:center;
   justify-content:center;
-  font-weight:800;
+
+  font-size:11px;
+  font-weight:700;
+
   overflow:hidden;
 }
 
+/* FURO INTERNO (define a espessura) */
 .bola::before{
   content:"";
   position:absolute;
-  width:24px;
-  height:24px;
+  width:28px;
+  height:28px;
   background:#020617;
   border-radius:50%;
-  z-index:1; /* 🔥 fica atrás */
+  z-index:1;
 }
 
+/* TEXTO % */
 .bola span{
   position:relative;
-  z-index:2; /* 🔥 fica na frente */
+  z-index:2;
+  font-size:11px;
+  font-weight:700;
 }
 
-/* PRATA REAL */
+/* CORES */
 .prata{
   background:conic-gradient(#c0c0c0 var(--p), #1e293b 0);
 }
 
-/* OURO REAL */
 .ouro{
   background:conic-gradient(#d4af37 var(--p), #1e293b 0);
 }
