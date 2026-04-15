@@ -661,7 +661,8 @@ function render(dados, dadosMes){
   window.dadosCache = dados
 
   function montarCard(emp){
-
+const ticketMedio = d.vendas > 0 ? d.total / d.vendas : 0
+const ticketAlmoco = d.almocoVendas > 0 ? d.almocoTotal / d.almocoVendas : 0
     const d = dados[emp] || {
       total:0, vendas:0, cancelados:0, valorCancelado:0,
       almocoTotal:0, almocoVendas:0
@@ -677,9 +678,10 @@ function render(dados, dadosMes){
           const ticketMedio = d.vendas > 0 ? d.total / d.vendas : 0
 
 <div style="display:flex;flex-direction:column;gap:2px">
+<div>
   <div class="valor">${brl(d.total)}</div>
   <div style="font-size:11px;color:#94a3b8">
-    🎯 Ticket: <b>${brl(ticketMedio)}</b>
+    Ticket: ${brl(ticketMedio)}
   </div>
 </div>
         </div>
@@ -712,7 +714,7 @@ function render(dados, dadosMes){
 <div class="almoco">
   🍽️ ${brl(d.almocoTotal)} (${d.almocoVendas})
   <br>
-  🎯 Ticket: <b>${brl(ticketAlmoco)}</b>
+  Ticket: ${brl(ticketAlmoco)}
 </div>
 
       <div class="mes">
@@ -805,11 +807,7 @@ dot.style.boxShadow = "0 0 10px #f59e0b"
 
 
 let dadosParciais = []
-const left = document.getElementById("left")
-const right = document.getElementById("right")
 
-left.innerHTML = ""
-right.innerHTML = ""
 let from = 0
 const step = 1000
 
