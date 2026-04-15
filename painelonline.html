@@ -1574,10 +1574,15 @@ if(periodoEl){
 // ================= RELOAD =================
 async function reload(){
 
-  const btn = document.getElementById("btnAplicar")
+const btn = document.getElementById("btnAplicar")
   const data = document.getElementById("data").value
 
+if(btn){
   btn.classList.add("loading")
+
+  if(btn){
+  btn.classList.remove("loading")
+}
 
   await new Promise(r => setTimeout(r, 150)) // 🔥 suaviza UX
 
@@ -1669,8 +1674,10 @@ async function rodarImportacaoAutomatica(){
 
     try{
 
-      document.getElementById("status").innerText =
-        "Importando: " + empresa
+ const statusEl = document.getElementById("status")
+if(statusEl){
+  statusEl.innerText = "Importando: " + empresa
+}
 
       await fetch(API_URL + "/api/importar-cupons",{
         method:"POST",
