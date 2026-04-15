@@ -1428,7 +1428,11 @@ localStorage.setItem(STORAGE_KEY, JSON.stringify({
 
 
 
-  function renderKPIs(dados){
+ function renderKPIs(dados){
+
+  const el = document.getElementById("kpis")
+
+  if(!el) return // 🔥 EVITA ERRO
 
   let total = 0
   let vendas = 0
@@ -1440,7 +1444,7 @@ localStorage.setItem(STORAGE_KEY, JSON.stringify({
     cancelados += d.cancelados
   })
 
-  document.getElementById("kpis").innerHTML = `
+  el.innerHTML = `
     <div class="kpi">
       <div class="label">Faturamento</div>
       <div class="value">${brl(total)}</div>
