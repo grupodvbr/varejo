@@ -176,14 +176,31 @@ header div:first-child{
 
 /* ================= METAS ================= */
 .metas{
-  display:flex;
-  gap:2px;
+  display:grid;
+  grid-template-columns: auto auto;
+  justify-content:center;
+  gap:6px 6px;
 }
 
-/* ================= METAS ================= */
-.metas{
+/* 🔥 mini ticket ocupa linha inteira */
+.mini-ticket{
+  grid-column: span 2;
+
   display:flex;
-  gap:6px;
+  align-items:center;
+  justify-content:space-between;
+
+  width:76px; /* 🔥 mesmo "peso visual" das 2 bolas */
+  margin:0 auto;
+
+  padding:4px 6px;
+
+  border-radius:10px;
+
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.06);
+
+  font-size:9px;
 }
 
 /* BOLINHA */
@@ -856,42 +873,36 @@ return `
 
 </div>
 
-    <div class="metas">
-      ${(() => {
+   <div class="metas">
+  ${(() => {
 
-        const meta = getMetaEmpresa(emp)
-        if(!meta) return ""
+    const meta = getMetaEmpresa(emp)
+    if(!meta) return ""
 
-        const pct1 = Math.min((dMes.total/meta.prata)*100,100)
-        const pct2 = Math.min((dMes.total/meta.ouro)*100,100)
+    const pct1 = Math.min((dMes.total/meta.prata)*100,100)
+    const pct2 = Math.min((dMes.total/meta.ouro)*100,100)
 
-        return `
-          <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+    return `
+      <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+        <div class="bola prata" style="--p:${pct1}%">
+          <span>${pct1.toFixed(0)}%</span>
+        </div>
+      </div>
 
-            <div class="bola prata" style="--p:${pct1}%">
-              <span>${pct1.toFixed(0)}%</span>
-            </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+        <div class="bola ouro" style="--p:${pct2}%">
+          <span>${pct2.toFixed(0)}%</span>
+        </div>
+      </div>
 
-            <div style="font-size:9px;font-weight:600;color:#94a3b8">
-              ${brl(meta.prata)}
-            </div>
-
-          </div>
-
-          <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
-
-            <div class="bola ouro" style="--p:${pct2}%">
-              <span>${pct2.toFixed(0)}%</span>
-            </div>
-
-            <div style="font-size:9px;font-weight:600;color:#d4af37">
-              ${brl(meta.ouro)}
-            </div>
-
-          </div>
-        `
-      })()}
-    </div>
+      <!-- 🔥 AGORA SIM: EMBAIXO DAS BOLAS -->
+      <div class="mini-ticket">
+        <span>${d.vendas}</span>
+        <span>${brl(ticketMedio)}</span>
+      </div>
+    `
+  })()}
+</div>
 
   </div>
 
