@@ -798,26 +798,28 @@ return `
   <div class="card-top">
 
 
-<div style="display:flex;flex-direction:column;gap:2px">
+<div style="display:flex;align-items:center;gap:8px">
+
   <img src="${getLogo(emp)}" class="logo">
 
-<div style="display:flex;flex-direction:column;gap:2px">
+  <div style="display:flex;flex-direction:column;gap:2px">
 
-  <!-- 🔥 VALOR DO MÊS (DESTAQUE) -->
-  <div class="valor-mes">
-    ${brl(dMes.total)}
+    <!-- MÊS -->
+    <div class="valor-mes">
+      ${brl(dMes.total)}
+    </div>
+
+    <!-- DIA -->
+    <div class="valor">
+      ${brl(d.total)}
+    </div>
+
+    <!-- INFO -->
+    <div style="font-size:11px;color:#94a3b8">
+      ${d.vendas} vendas • Ticket: ${brl(ticketMedio)}
+    </div>
+
   </div>
-
-  <!-- 🔽 VALOR DO DIA -->
-  <div class="valor">
-    ${brl(d.total)}
-  </div>
-
-  <div style="font-size:11px;color:#94a3b8">
-    ${d.vendas} vendas • Ticket: ${brl(ticketMedio)}
-  </div>
-
-</div>
 
 </div>
 
