@@ -73,12 +73,35 @@ header div:first-child{
   height: calc(100vh - 50px);
   display:grid;
 
-  grid-template-columns: 1fr 2fr; /* 🔥 esquerda menor, direita maior */
-  grid-template-rows: repeat(4, 1fr);
+  /* 🔥 AGORA SIM: 3 COLUNAS REAIS */
+  grid-template-columns: repeat(3, 1fr);
+
+  /* 🔥 LINHAS AUTOMÁTICAS */
+  grid-auto-rows: 1fr;
 
   gap:8px;
   padding:8px;
 }
+
+
+
+  /* LINHA 1 */
+#villa        { grid-column:1; grid-row:1; }
+#restaurante  { grid-column:2; grid-row:1; }
+#emporio      { grid-column:3; grid-row:1; }
+
+/* LINHA 2 */
+#delicia      { grid-column:1; grid-row:2; }
+#mkids        { grid-column:2; grid-row:2; }
+
+/* 🔥 TOTAL GRANDE */
+#totalMercatto{
+  grid-column: span 2; /* ocupa 2 colunas */
+  grid-row:2;
+}
+
+/* LINHA 3 */
+#padaria      { grid-column:1; grid-row:3; }
 /* ================= CARD ================= */
 .card{
   background:linear-gradient(180deg,var(--card),var(--card2));
@@ -365,6 +388,31 @@ header div:first-child{
 #extra{
   display:none;
 }
+
+
+
+  .grid{
+  height: calc(100vh - 50px);
+  display:grid;
+
+  grid-template-columns: 1fr 2fr; /* esquerda menor, direita maior */
+  grid-template-rows: repeat(3, 1fr);
+
+  gap:8px;
+  padding:8px;
+}
+.right-grid{
+  grid-column:2;
+  grid-row:1 / 4; /* ocupa toda altura */
+
+  display:grid;
+
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+
+  gap:8px;
+}
+    
 </style>
 </head>
 
@@ -383,14 +431,12 @@ header div:first-child{
 <div class="grid">
 
   <!-- ESQUERDA -->
-  <div class="col-esquerda">
-    <div id="villa" class="card"></div>
-    <div id="delicia" class="card"></div>
-    <div id="padaria" class="card"></div>
-  </div>
+  <div id="villa" class="card"></div>
+  <div id="delicia" class="card"></div>
+  <div id="padaria" class="card"></div>
 
-  <!-- DIREITA -->
-  <div class="col-direita">
+  <!-- DIREITA (GRID INTERNA) -->
+  <div class="right-grid">
     <div id="restaurante" class="card"></div>
     <div id="emporio" class="card"></div>
     <div id="mkids" class="card"></div>
