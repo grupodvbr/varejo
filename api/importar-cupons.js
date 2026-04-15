@@ -85,7 +85,7 @@ export default async function handler(req, res){
 
     // ================= VARIÁVEIS =================
     let pagina = 1
-    const count = 200
+    const count = 500
 
     let totalCupons = 0
     let totalPagamentos = 0
@@ -99,7 +99,7 @@ let ultimaPaginaHash = null
     // ================= LOOP =================
     while(true){
 
-      const url = `${baseURL}?pagina=${pagina}&count=${count}&q=dataHora=ge=${inicio}T00:00:00;dataHora=le=${fim}T23:59:59`
+      const url = `${baseURL}?pagina=${pagina}&count=${count}&q=data=ge=${inicio};data=le=${fim}`
 
       const t0 = Date.now()
 
@@ -233,8 +233,8 @@ await supabase
 
       totalPaginas++
 
-if(pagina > 50){
-  log("⛔ Limite de segurança (50 páginas)")
+if(pagina > 10){
+  log("⛔ Limite de segurança (10 páginas)")
   break
 }
 
