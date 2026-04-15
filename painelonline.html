@@ -147,15 +147,6 @@ header div:first-child{
   margin-top:4px;
 }
 
-/* ================= ALMOÇO ================= */
-.almoco{
-  margin-top:6px;
-  padding:6px;
-  border-radius:8px;
-  background:#020617;
-  font-size:clamp(9px, 1.3vw, 11px);
-  border:1px solid var(--border);
-}
 
 /* ================= MÊS ================= */
 .mes{
@@ -336,10 +327,18 @@ header div:first-child{
 }
 
 
-  .almoco{
+.almoco{
   display:flex;
-  flex-direction:column;
-  gap:2px;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+
+  margin-top:6px;
+  padding:6px;
+  border-radius:8px;
+  background:#020617;
+  font-size:clamp(9px, 1.3vw, 11px);
+  border:1px solid var(--border);
 }
 
 #extra{
@@ -853,11 +852,10 @@ return `
 
   </div>
 
-  <div class="almoco">
-    🍽️ ${brl(d.almocoTotal)} (${d.almocoVendas})
-    <br>
-    Ticket: ${brl(ticketAlmoco)}
-  </div>
+<div class="almoco">
+  <span>🍽️ ${brl(d.almocoTotal)} (${d.almocoVendas})</span>
+  <span>Ticket: ${brl(ticketAlmoco)}</span>
+</div>
 
   <div class="mes">
     <span>📊 Mês</span>
