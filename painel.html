@@ -1305,8 +1305,10 @@ setTimeout(async () => {
 
   const financeiro = await carregarFinanceiroIsolado()
 
-  const faturamento =
-    window.dadosMesCache?.["MERCATTO RESTAURANTE"]?.total || 0
+const faturamento =
+  (window.dadosMesCache?.["MERCATTO RESTAURANTE"]?.total || 0) +
+  (window.dadosMesCache?.["MERCATTO EMPÓRIO"]?.total || 0) +
+  (window.dadosMesCache?.["MKIDS"]?.total || 0)
 
   window.travasFinanceiro = calcularTravasIsolado(
     financeiro,
