@@ -802,24 +802,24 @@ return `
 
   <img src="${getLogo(emp)}" class="logo">
 
-  <div style="display:flex;flex-direction:column;gap:2px">
+ <div style="display:flex;flex-direction:column;gap:2px">
 
-    <!-- MÊS -->
-    <div class="valor-mes">
-      ${brl(dMes.total)}
-    </div>
-
-    <!-- DIA -->
-    <div class="valor">
-      ${brl(d.total)}
-    </div>
-
-    <!-- INFO -->
-    <div style="font-size:11px;color:#94a3b8">
-      ${d.vendas} vendas • Ticket: ${brl(ticketMedio)}
-    </div>
-
+  <!-- MÊS (maior) -->
+  <div class="valor-mes">
+    ${brl(dMes.total)}
   </div>
+
+  <!-- DIA -->
+  <div class="valor">
+    ${brl(d.total)}
+  </div>
+
+  <!-- VENDAS + TICKET NA MESMA LINHA -->
+  <div class="info-linha">
+    ${d.vendas} vendas • Ticket ${brl(ticketMedio)}
+  </div>
+
+</div>
 
 </div>
 
