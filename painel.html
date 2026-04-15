@@ -883,7 +883,6 @@ const TRAVAS_MANUAL = {
   "DELICIA": { fornecedores: 7000, geral: 3000 },
   "PADARIA": { fornecedores: 4000, geral: 1500 },
   "MERCATTO RESTAURANTE": { fornecedores: 12000, geral: 6000 },
-  "MERCATTO EMPÓRIO": { fornecedores: 8000, geral: 3500 },
   "MKIDS": { fornecedores: 2000, geral: 1000 }
 }
 
@@ -999,6 +998,7 @@ return `
   document.getElementById("villa").innerHTML = montarCard("VILLA")
   document.getElementById("delicia").innerHTML = montarCard("DELICIA")
   document.getElementById("padaria").innerHTML = montarCard("PADARIA")
+  document.getElementById("mkids").innerHTML = montarCard("MKIDS")
   document.getElementById("restaurante").innerHTML = montarCard("MERCATTO RESTAURANTE")
   document.getElementById("emporio").innerHTML = montarCard("MERCATTO EMPÓRIO")
 
@@ -1379,18 +1379,19 @@ function normalizarEmpresa(empBase, caixa){
 
   const nome = (empBase || "").trim().toUpperCase()
 
+  if(nome.includes("MKIDS")) return "MKIDS"
+
   if(nome.includes("DELICIA")) return "DELICIA"
   if(nome.includes("VILLA")) return "VILLA"
   if(nome.includes("PADARIA")) return "PADARIA"
 
   if(nome.includes("MERCATTO")){
     if(caixa >= 1 && caixa <= 5) return "MERCATTO EMPÓRIO"
-    if(caixa >= 6) return "MERCATTO RESTAURANTE"
+    if(caixa >= 6 && caixa <= 10) return "MERCATTO RESTAURANTE"
   }
 
   return nome
 }
-
   
 
 async function carregarMesBackground(dataSelecionada){
