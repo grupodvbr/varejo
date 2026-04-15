@@ -300,6 +300,15 @@ header div:first-child{
 .bola span{
   font-weight:800;
 }
+
+
+  .almoco{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+
+    
 </style>
 </head>
 
@@ -665,7 +674,14 @@ function render(dados, dadosMes){
 
         <div style="display:flex;align-items:center;gap:8px">
           <img src="${getLogo(emp)}" class="logo">
-          <div class="valor">${brl(d.total)}</div>
+          const ticketMedio = d.vendas > 0 ? d.total / d.vendas : 0
+
+<div style="display:flex;flex-direction:column;gap:2px">
+  <div class="valor">${brl(d.total)}</div>
+  <div style="font-size:11px;color:#94a3b8">
+    🎯 Ticket: <b>${brl(ticketMedio)}</b>
+  </div>
+</div>
         </div>
 
         <div class="metas">
@@ -691,9 +707,13 @@ function render(dados, dadosMes){
 
       <div class="vendas">${d.vendas} vendas</div>
 
-      <div class="almoco">
-        🍽️ ${brl(d.almocoTotal)} (${d.almocoVendas})
-      </div>
+      const ticketAlmoco = d.almocoVendas > 0 ? d.almocoTotal / d.almocoVendas : 0
+
+<div class="almoco">
+  🍽️ ${brl(d.almocoTotal)} (${d.almocoVendas})
+  <br>
+  🎯 Ticket: <b>${brl(ticketAlmoco)}</b>
+</div>
 
       <div class="mes">
         <span>📊 Mês</span>
