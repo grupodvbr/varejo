@@ -707,11 +707,32 @@ function normalizarFinanceiroEmpresa(nome){
   const n = (nome || "").toUpperCase()
 
   if(n.includes("VILLA")) return "VILLA"
-  if(n.includes("DELICIA")) return "DELICIA"
-  if(n.includes("PADARIA")) return "PADARIA"
-  if(n.includes("EMPORIO")) return "MERCATTO EMPÓRIO"
-  if(n.includes("RESTAURANTE")) return "MERCATTO RESTAURANTE"
-  if(n.includes("KIDS")) return "MKIDS"
+
+  if(n.includes("DELICIA") || n.includes("DELÍCIA"))
+    return "DELICIA"
+
+  if(n.includes("PADARIA"))
+    return "PADARIA"
+
+  if(
+    n.includes("EMPORIO") ||
+    n.includes("EMPÓRIO")
+  ){
+    return "MERCATTO EMPÓRIO"
+  }
+
+  if(
+    n.includes("RESTAURANTE") ||
+    n.includes("MERCATTO REST")
+  ){
+    return "MERCATTO RESTAURANTE"
+  }
+
+  if(n.includes("KIDS") || n.includes("MKIDS"))
+    return "MKIDS"
+
+  // 🔥 DEBUG (IMPORTANTE)
+  console.log("❌ EMPRESA F360 NÃO MAPEADA:", nome)
 
   return null
 }
@@ -838,6 +859,30 @@ if(isAlmoco){
   })
 
 
+// 🔥🔥🔥 COLE EXATAMENTE AQUI 🔥🔥🔥
+const EMPRESAS_BASE = [
+  "VILLA",
+  "DELICIA",
+  "PADARIA",
+  "MERCATTO EMPÓRIO",
+  "MERCATTO RESTAURANTE",
+  "MKIDS"
+]
+
+EMPRESAS_BASE.forEach(emp=>{
+  if(!result[emp]){
+    result[emp] = {
+      total:0,
+      vendas:0,
+      cancelados:0,
+      valorCancelado:0,
+      finais:{},
+      almocoTotal:0,
+      almocoVendas:0
+    }
+  }
+})
+
 
 // ================= FINANCEIRO =================
 
@@ -855,8 +900,23 @@ const empRaw =
 
 const emp = normalizarFinanceiroEmpresa(empRaw)
 
-if(!emp || !result[emp]) return
+if(!emp){
+  console.log("❌ F360 SEM EMPRESA:", f)
+  return
+}
 
+// 🔥 GARANTE EXISTÊNCIA
+if(!result[emp]){
+  result[emp] = {
+    total:0,
+    vendas:0,
+    cancelados:0,
+    valorCancelado:0,
+    finais:{},
+    almocoTotal:0,
+    almocoVendas:0
+  }
+}
   const d = result[emp]
 
   const valor = Number(f.valor || 0)
@@ -1506,9 +1566,10 @@ dot.style.background = "#22c55e"
 dot.style.boxShadow = "0 0 10px #22c55e"
 
 console.log("✅ FINALIZADO LOAD")
-document.getElementById("periodo").innerText =
-  `Data: ${dataSelecionada}`
-
+const periodoEl = document.getElementById("periodo")
+if(periodoEl){
+  periodoEl.innerText = `Data: ${dataSelecionada}`
+}
 }
 // ================= RELOAD =================
 async function reload(){
