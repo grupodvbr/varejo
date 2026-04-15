@@ -123,10 +123,15 @@ header div:first-child{
   border-radius:50%;
   object-fit:cover;
   border:2px solid var(--border);
-  margin-top:-6px;
-  transform: translateY(-4px); /* 👈 SOBE A LOGO */
-}
 
+  margin-top:-2px; /* 🔥 ajuste fino */
+  transform:none; /* 🔥 remove o excesso */
+}
+@media (min-width:1400px){
+  .logo{
+    margin-top:-1px;
+  }
+}
 /* ================= VALOR ================= */
 .valor{
   font-size:clamp(10px, 1.4vw, 12px);
