@@ -1467,20 +1467,18 @@ data.forEach(v => {
 
 })
 
-window.dadosMesCache = parcial
-
 // 🔥 ATUALIZA TELA EM TEMPO REAL
 if(window.dadosCache){
   render(window.dadosCache, window.dadosMesCache)
 }
+
+// 🔥 SUAVIZA LOOP
 await new Promise(r => setTimeout(r, 30))
 
-
-    
-    // 🔥 salva progresso REAL
+// 🔥 SALVA CACHE CORRETO
 localStorage.setItem(STORAGE_KEY, JSON.stringify({
   dados: cache.dados || {},
-  dadosMes: parcial,
+  dadosMes: window.dadosMesCache,
   ultimaPaginaMes: from + step,
   atualizadoEm: new Date().toISOString()
 }))
