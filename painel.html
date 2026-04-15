@@ -1428,6 +1428,16 @@ if(cache.dadosMes){
       new Date(fimMes)
     )
 
+window.dadosMesCache = parcial
+
+// 🔥 ATUALIZA TELA EM TEMPO REAL
+if(window.dadosCache){
+  render(window.dadosCache, parcial)
+}
+await new Promise(r => setTimeout(r, 30))
+
+
+    
     // 🔥 salva progresso REAL
 localStorage.setItem(STORAGE_KEY, JSON.stringify({
   dados: cache.dados || {},
