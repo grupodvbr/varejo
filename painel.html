@@ -839,7 +839,67 @@ function getMetaEmpresa(nome){
   return null
 }
   
+function montarTravaManual(fornecedores, geral){
 
+  const total = fornecedores + geral || 1
+
+  function linha(nome, valor, cor){
+    const pct = (valor / total) * 100
+
+    return `
+      <div style="margin-top:6px">
+
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          font-size:10px;
+          color:#94a3b8;
+        ">
+          <span>${nome}</span>
+          <span>${brl(valor)}</span>
+        </div>
+
+        <div style="
+          width:100%;
+          height:6px;
+          background:#1e293b;
+          border-radius:4px;
+          margin-top:3px;
+        ">
+          <div style="
+            width:${pct}%;
+            height:100%;
+            background:${cor};
+            border-radius:4px;
+          "></div>
+        </div>
+
+      </div>
+    `
+  }
+
+  return `
+    <div style="
+      margin-top:6px;
+      border-top:1px solid #1e293b;
+      padding-top:6px;
+    ">
+      ${linha("Fornecedores", fornecedores, "#ef4444")}
+      ${linha("Geral", geral, "#3b82f6")}
+    </div>
+  `
+}
+
+
+
+const TRAVAS_MANUAL = {
+  "VILLA": { fornecedores: 5000, geral: 2000 },
+  "DELICIA": { fornecedores: 7000, geral: 3000 },
+  "PADARIA": { fornecedores: 4000, geral: 1500 },
+  "MERCATTO RESTAURANTE": { fornecedores: 12000, geral: 6000 },
+  "MERCATTO EMPÓRIO": { fornecedores: 8000, geral: 3500 },
+  "MKIDS": { fornecedores: 2000, geral: 1000 }
+}
 
 
 
@@ -867,7 +927,7 @@ function render(dados, dadosMes){
     // ✅ CALCULA FORA DO HTML
     const ticketMedio = d.vendas > 0 ? d.total / d.vendas : 0
     const ticketAlmoco = d.almocoVendas > 0 ? d.almocoTotal / d.almocoVendas : 0
-
+    const trava = TRAVAS_MANUAL[emp] || { fornecedores:0, geral:0 }
 return `
   <div class="card-top">
 
@@ -944,6 +1004,7 @@ return `
 </div>
 
   </div>
+  ${montarTravaManual(trava.fornecedores, trava.geral)}
 
 `
   }
@@ -1299,26 +1360,7 @@ dot.style.boxShadow = "0 0 10px #22c55e"
 // ================= FINANCEIRO ISOLADO =================
 setTimeout(async () => {
 
-  const financeiro = await carregarFinanceiroIsolado()
-
-const faturamento =
-  (window.dadosMesCache?.["MERCATTO RESTAURANTE"]?.total || 0) +
-  (window.dadosMesCache?.["MERCATTO EMPÓRIO"]?.total || 0) +
-  (window.dadosMesCache?.["MKIDS"]?.total || 0)
-
-  window.travasFinanceiro = calcularTravasIsolado(
-    financeiro,
-    faturamento
-  )
-
-  atualizarTravasCard()
-
-}, 500)
-console.log("✅ FINALIZADO LOAD")
-document.getElementById("periodo").innerText =
-  `Data: ${dataSelecionada}`
-
-}
+ 
 // ================= RELOAD =================
 async function reload(){
 
@@ -1818,106 +1860,8 @@ if(venc < inicioDia || venc > fimDia) return
     pctG: faturamento ? (geral / faturamento * 100) : 0
   }
 }
-function atualizarTravasCard(){
 
-  const el = document.getElementById("travasBox")
-  if(!el) return
-
-  const t = window.travasFinanceiro || {}
-
-  function linha(titulo, valor, total, cor){
-
-    const pct = total > 0 ? (valor / total) * 100 : 0
-
-    return `
-      <div style="margin-bottom:10px">
-
-        <!-- TITULO -->
-        <div style="
-          display:flex;
-          justify-content:space-between;
-          font-size:11px;
-          color:#94a3b8;
-          margin-bottom:4px;
-        ">
-          <span>${titulo}</span>
-          <span>${brl(valor)} / ${brl(total)}</span>
-        </div>
-
-        <!-- BARRA -->
-        <div style="
-          width:100%;
-          height:10px;
-          background:#1e293b;
-          border-radius:6px;
-          overflow:hidden;
-        ">
-          <div style="
-            width:${pct}%;
-            height:100%;
-            background:${cor};
-            border-radius:6px;
-            transition:0.4s;
-          "></div>
-        </div>
-
-        <!-- % -->
-        <div style="
-          text-align:right;
-          font-size:10px;
-          margin-top:2px;
-          color:${pct > 100 ? '#ef4444' : '#94a3b8'};
-        ">
-          ${pct.toFixed(1)}%
-        </div>
-
-      </div>
-    `
-  }
-
-  el.innerHTML = `
-    <div style="
-      margin-top:6px;
-      border-top:1px solid #1e293b;
-      padding-top:6px;
-      font-size:10px
-    ">
-
-      ${linha(
-        "Fornecedores",
-        t.fornecedores || 0,
-        (t.fornecedores + t.geral) || 1,
-        "#ef4444"
-      )}
-
-      ${linha(
-        "Geral",
-        t.geral || 0,
-        (t.fornecedores + t.geral) || 1,
-        "#3b82f6"
-      )}
-
-    </div>
-  `
-}
-
-
-  
 </script>
-
-<div id="travasBox" style="
-  position:fixed;
-  bottom:10px;
-  right:10px;
-  background:#020617;
-  border:1px solid #1e293b;
-  padding:10px;
-  border-radius:10px;
-  font-size:12px;
-  z-index:999;
-"></div>
-
-
 
 
 
