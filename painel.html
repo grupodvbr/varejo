@@ -1319,8 +1319,21 @@ salvarCache(
 const inicio = new Date(dataSelecionada + "T00:00:00")
 const fim = new Date(dataSelecionada + "T23:59:59")
 
-const finalDados = process(dadosParciais, inicio, fim)
-console.log("📊 FINAL FILTRADO:", finalDados)
+const finalDados = {}
+
+dadosParciais.forEach(v => {
+  finalDados[v.empresa] = {
+    total: Number(v.total || 0),
+    vendas: Number(v.vendas || 0),
+    cancelados: Number(v.cancelados || 0),
+    valorCancelado: Number(v.valor_cancelado || 0),
+    almocoTotal: 0,
+    almocoVendas: 0
+  }
+})
+  
+  
+  console.log("📊 FINAL FILTRADO:", finalDados)
 
 // ✅ AQUI (EXATO)
 if(!window.renderInicializado){
