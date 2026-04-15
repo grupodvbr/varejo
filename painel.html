@@ -1109,7 +1109,6 @@ let query = sb
   .select("*")
   .gte("data", dataSelecionada)
   .lte("data", dataSelecionada)
-  .eq("cancelado", false)
   .order("data", { ascending: true })
   .order("id", { ascending: true })
   .limit(step)
@@ -1228,7 +1227,6 @@ const { data, error } = await sb
   .select("*")
   .gte("data", inicioMes)
   .lte("data", fimMes)
-  .eq("cancelado", false)
   .order("data", { ascending: true })
   .range(fromMes, fromMes + stepMes - 1)
 
@@ -1426,7 +1424,6 @@ if(cache.dadosMes){
       .select("*")
       .gte("data", inicioMes)
       .lte("data", fimMes)
-      .eq("cancelado", false)
       .order("data", { ascending: true })
       .range(from, from + step - 1)
 
