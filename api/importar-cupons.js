@@ -94,14 +94,31 @@ export default async function handler(req, res){
     const ids = new Set()
 
     log("📡 INICIANDO PAGINAÇÃO...\n")
+
+
+    const intervalos = [
+  ["00:00:00","05:59:59"],
+  ["06:00:00","11:59:59"],
+  ["12:00:00","17:59:59"],
+  ["18:00:00","23:59:59"]
+]
+
+    
      let paginaSemNovos = 0
 let ultimaPaginaHash = null
 let totalRecebidos = 0
     
     // ================= LOOP =================
-    while(true){
+for(const [horaInicio, horaFim] of intervalos){
 
-const url = `${baseURL}?pagina=${pagina}&count=${count}&q=dataHora=ge=${inicio}T00:00:00;dataHora=le=${fim}T23:59:59`
+  log(`🕒 Intervalo: ${horaInicio} → ${horaFim}`)
+
+  let pagina = 1
+  let paginaSemNovos = 0
+
+  while(true){
+
+    const url = `${baseURL}?pagina=${pagina}&count=${count}&q=dataHora=ge=${inicio}T${horaInicio};dataHora=le=${fim}T${horaFim}`
       const t0 = Date.now()
 
       let response
@@ -137,14 +154,18 @@ if(!response || !response.ok){
       log(`📄 Página ${pagina} | Itens: ${items.length} | Tempo: ${tempoReq}s`)
 
 if(items.length === 0){
-  log("🏁 Última página vazia - FIM")
-  break
+  paginaSemNovos++
+
+  log(`⚠️ Página vazia (${paginaSemNovos})`)
+
+  if(paginaSemNovos >= 3){
+    log("🏁 Fim real detectado")
+    break
+  }
+
+  pagina++
+  continue
 }
-
-
-
-ultimaPaginaHash = paginaHash
-
       const inserts = []
       const pagamentos = []
 
@@ -268,7 +289,9 @@ log(`\n⏱ Tempo total: ${tempoTotal}s`)
 
 log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
   
-  log(`📊 Total cupons: ${totalCupons}`)
+  log(`📥 Total recebido da API: ${totalRecebidos}`)
+log(`💾 Total inserido REAL: ${totalCupons}`)
+log(`📉 Diferença: ${totalRecebidos - totalCupons}`)
     log(`💳 Total pagamentos: ${totalPagamentos}`)
     log(`📄 Total páginas: ${totalPaginas}`)
     log(`⏱ Tempo total: ${tempoTotal}s`)
