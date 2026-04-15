@@ -91,14 +91,13 @@ export default async function handler(req, res){
     let totalPagamentos = 0
     let totalPaginas = 0
 
-    ids.add(unique_id)
 
     log("📡 INICIANDO PAGINAÇÃO...\n")
 let paginasSemNovos = 0
     // ================= LOOP =================
     while(true){
 
-      const url = `${baseURL}?pagina=${pagina}&count=${count}&q=data=ge=${inicio};data=le=${fim}`
+      const url = `${baseURL}?pagina=${pagina}&count=${count}&q=datahora=ge=${inicio}T00:00:00;datahora=le=${fim}T23:59:59`
       const t0 = Date.now()
 
       let response
@@ -132,8 +131,15 @@ if(!response || !response.ok){
       log(`📄 Página ${pagina} | Itens: ${items.length} | Tempo: ${tempoReq}s`)
 
 if(items.length === 0){
-  log("🏁 Última página vazia - FIM")
-  break
+  paginasSemNovos++
+
+  if(paginasSemNovos >= 3){
+    log("🏁 Fim real detectado")
+    break
+  }
+
+  pagina++
+  continue
 }
 
 // 🔍 Detecta repetição de página (API bug comum)
@@ -163,7 +169,7 @@ paginasSemNovos = 0
       for(const cupom of novos){
 
         const unique_id = empresa + "_" + cupom.id
-
+        ids.add(unique_id) // 🔥 AQUI
 
 log(`🧾 Cupom ${cupom.id} | R$ ${cupom.valor || 0}`)
 inserts.push({
