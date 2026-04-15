@@ -94,13 +94,12 @@ export default async function handler(req, res){
     const ids = new Set()
 
     log("📡 INICIANDO PAGINAÇÃO...\n")
-     let paginaSemNovos = 0
+    let paginasSemNovos = 0
 let ultimaPaginaHash = null
     // ================= LOOP =================
     while(true){
 
-      const url = `${baseURL}?pagina=${pagina}&count=${count}&q=data=ge=${inicio};data=le=${fim}`
-
+const url = `${baseURL}?pagina=${pagina}&count=${count}&q=datahora=ge=${inicio}T00:00:00;datahora=le=${fim}T23:59:59`
       const t0 = Date.now()
 
       let response
@@ -139,16 +138,26 @@ if(items.length === 0){
 }
 
 // 🔍 Detecta repetição de página (API bug comum)
-const paginaHash = JSON.stringify(items.map(i => i.id))
+const novos = items.filter(c => {
+  const id = empresa + "_" + c.id
+  return !ids.has(id)
+})
 
-if(paginaHash === ultimaPaginaHash){
-  log("⚠️ Página repetida - pulando...")
+if(novos.length === 0){
+  paginasSemNovos++
+
+  log(`⚠️ Página sem novos (${paginasSemNovos})`)
+
+  if(paginasSemNovos >= 3){
+    log("🏁 Fim real detectado")
+    break
+  }
+
   pagina++
   continue
 }
 
-ultimaPaginaHash = paginaHash
-
+paginasSemNovos = 0
       const inserts = []
       const pagamentos = []
 
@@ -156,11 +165,6 @@ ultimaPaginaHash = paginaHash
 
         const unique_id = empresa + "_" + cupom.id
 
- if(ids.has(unique_id)){
-  continue
-}
-
-        ids.add(unique_id)
 
 log(`🧾 Cupom ${cupom.id} | R$ ${cupom.valor || 0}`)
 inserts.push({
@@ -233,10 +237,6 @@ await supabase
 
       totalPaginas++
 
-if(pagina > 10){
-  log("⛔ Limite de segurança (10 páginas)")
-  break
-}
 
       pagina++
 
