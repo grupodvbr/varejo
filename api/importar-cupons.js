@@ -85,7 +85,7 @@ export default async function handler(req, res){
 
     // ================= VARIÁVEIS =================
     let pagina = 1
-    const count = 500
+    const count = 1000
 
     let totalCupons = 0
     let totalPagamentos = 0
